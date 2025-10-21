@@ -1,4 +1,8 @@
-# Nu primesc notă pentru că nu am pus titlu și descriere
+# Zooma
+
+Joc rapid de strategie de tip puzzle. 
+
+
 
 ### Folosiți template-ul corespunzător grupei voastre!
 
