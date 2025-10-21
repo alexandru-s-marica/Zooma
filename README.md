@@ -1,8 +1,7 @@
 # Zooma
 
+### Descriere
 Joc rapid de strategie de tip puzzle. 
-
-
 
 ### Folosiți template-ul corespunzător grupei voastre!
 
