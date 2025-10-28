@@ -4,6 +4,8 @@ project(oop)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(GNUInstallDirs)
+
 add_executable(oop
         main.cpp
         Bila.cpp
@@ -11,3 +13,5 @@ add_executable(oop
         SirDeBile.cpp
         Nivel.cpp
 )
+
+install(TARGETS oop RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
