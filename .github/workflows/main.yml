@@ -1,0 +1,29 @@
+name: C++ CI (Compilare Proiect)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Compile
+        run: |
+          g++ -std=c++17 -Wall -o zooma *.cpp
+      - name: Run (Test)
+        run: ./zooma
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Compile
+        shell: msvc-build-tools-path
+        run: |
+          cl.exe /EHsc /Fe:zooma.exe *.cpp
+      - name: Run (Test)
+        run: .\zooma.exe

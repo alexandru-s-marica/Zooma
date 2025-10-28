@@ -1,50 +1,65 @@
+#include "Nivel.h"
 #include <iostream>
-#include <array>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <random>
 
-int main() {
-    std::cout << "Hello, world!\n";
-    std::array<int, 100> v{};
-    int nr;
-    std::cout << "Introduceți nr: ";
-    /////////////////////////////////////////////////////////////////////////
-    /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
-    /// dați exemple de date de intrare folosind fișierul tastatura.txt
-    /// Trebuie să aveți în fișierul tastatura.txt suficiente date de intrare
-    /// (în formatul impus de voi) astfel încât execuția programului să se încheie.
-    /// De asemenea, trebuie să adăugați în acest fișier date de intrare
-    /// pentru cât mai multe ramuri de execuție.
-    /// Dorim să facem acest lucru pentru a automatiza testarea codului, fără să
-    /// mai pierdem timp de fiecare dată să introducem de la zero aceleași date de intrare.
-    ///
-    /// Pe GitHub Actions (bife), fișierul tastatura.txt este folosit
-    /// pentru a simula date introduse de la tastatură.
-    /// Bifele verifică dacă programul are erori de compilare, erori de memorie și memory leaks.
-    ///
-    /// Dacă nu puneți în tastatura.txt suficiente date de intrare, îmi rezerv dreptul să vă
-    /// testez codul cu ce date de intrare am chef și să nu pun notă dacă găsesc vreun bug.
-    /// Impun această cerință ca să învățați să faceți un demo și să arătați părțile din
-    /// program care merg (și să le evitați pe cele care nu merg).
-    ///
-    /////////////////////////////////////////////////////////////////////////
-    std::cin >> nr;
-    /////////////////////////////////////////////////////////////////////////
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "v[" << i << "] = ";
-        std::cin >> v[i];
+int main()
+{
+    std::srand(std::random_device{}());
+
+    Nivel joc({50, 50}, 25.0f);
+    joc.adaugaBileStart();
+
+    std::cout << "Stare initiala joc:" << std::endl;
+    std::cout << joc << std::endl;
+
+    std::ifstream f("tastatura.txt");
+    if (!f.is_open()) {
+        std::cerr << "EROARE: Nu am putut deschide tastatura.txt!" << std::endl;
+        return 1;
     }
-    std::cout << "\n\n";
-    std::cout << "Am citit de la tastatură " << nr << " elemente:\n";
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "- " << v[i] << "\n";
+
+    std::string linie, comanda;
+    float valoare;
+
+    std::cout << "\n--- Incepe citirea comenzilor din tastatura.txt ---\n";
+    while (std::getline(f, linie))
+    {
+        if (linie.empty() || linie[0] == '#') continue;
+
+        std::stringstream ss(linie);
+        ss >> comanda >> valoare;
+
+        std::cout << "\n>>> COMANDA CITITA: " << comanda << " " << valoare << std::endl;
+
+        joc.proceseazaComanda(comanda, valoare);
+
+        std::cout << joc << std::endl;
+
+        if (joc.isTerminat()) {
+            std::cout << "JOCUL S-A TERMINAT!" << std::endl;
+            break;
+        }
     }
-    ///////////////////////////////////////////////////////////////////////////
-    /// Pentru date citite din fișier, NU folosiți tastatura.txt. Creați-vă voi
-    /// alt fișier propriu cu ce alt nume doriți.
-    /// Exemplu:
-    /// std::ifstream fis("date.txt");
-    /// for(int i = 0; i < nr2; ++i)
-    ///     fis >> v2[i];
-    ///
-    ///////////////////////////////////////////////////////////////////////////
+    f.close();
+    std::cout << "--- Sfarsit citire comenzi ---\n";
+
+    std::cout << "\nSCOR FINAL: " << joc.getScor() << std::endl;
+
+    std::cout << "\n--- DEMONSTRATIE REGULA CELOR TREI ---\n";
+    {
+        std::cout << "Test Constructor Copiere (s2 = s1)...\n";
+        SirDeBile s1_copie = joc.getSirDeBile();
+
+        std::cout << "Test Operator Atribuire (s3 = s1)...\n";
+        [[maybe_unused]] SirDeBile s2_atribuire;
+        s2_atribuire = joc.getSirDeBile();
+
+        std::cout << "Obiectele copie vor fi distruse acum (ies din scope)...\n";
+    }
+
+    std::cout << "Obiectul original 'joc' va fi distrus acum (ies din main)...\n";
     return 0;
 }

@@ -1,2 +1,13 @@
-5
-11 22 33 44 55
+avanseaza 1.0
+trage 12.5
+avanseaza 1.0
+avanseaza 1.0
+trage 10.5
+avanseaza 1.0
+trage 15.5
+avanseaza 2.0
+avanseaza 2.0
+trage 14.5
+avanseaza 5.0
+avanseaza 5.0
+avanseaza 5.0
