@@ -15,3 +15,9 @@ add_executable(oop
 )
 
 install(TARGETS oop RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(FILES
+        launcher.command
+        tastatura.txt
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
