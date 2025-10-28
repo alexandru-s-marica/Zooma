@@ -13,7 +13,6 @@ public:
     Bila();
 
     Culoare getCuloare() const;
-    Point getPozitie() const;
     float getDistanta() const;
 
     void setPozitie(Point p);

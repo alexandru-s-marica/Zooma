@@ -24,10 +24,6 @@ Bila Proiector::trageBila() {
     return bilaTrasa;
 }
 
-const Bila& Proiector::getBilaCurenta() const {
-    return bilaCurenta;
-}
-
 std::ostream& operator<<(std::ostream& os, const Proiector& p) {
     os << "[Proiector: Gata cu " << p.bilaCurenta
        << " | Urmeaza " << p.bilaUrmatoare << "]";

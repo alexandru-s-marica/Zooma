@@ -12,9 +12,10 @@ SirDeBile::~SirDeBile() {
     idSir = nullptr;
 }
 
-SirDeBile::SirDeBile(const SirDeBile& other) {
-    bile = other.bile;
-    idSir = new int(*other.idSir); // Deep copy
+SirDeBile::SirDeBile(const SirDeBile& other)
+    : bile(other.bile)
+{
+    idSir = new int(*other.idSir);
 }
 
 SirDeBile& SirDeBile::operator=(const SirDeBile& other)

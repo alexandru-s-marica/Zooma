@@ -6,7 +6,6 @@ Bila::Bila(Culoare c, Point p, float dist)
 Bila::Bila() : culoare(Culoare::NIMIC), pozitie({0,0}), distantaPeTraseu(0) {}
 
 Culoare Bila::getCuloare() const { return culoare; }
-Point Bila::getPozitie() const { return pozitie; }
 float Bila::getDistanta() const { return distantaPeTraseu; }
 
 void Bila::setPozitie(Point p) {
