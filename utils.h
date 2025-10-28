@@ -8,6 +8,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <ctime>
+#include <random> // Adaugat pentru C++ modern random
 
 struct Point {
     float x=0.0f;
@@ -20,6 +21,13 @@ enum class Culoare {
     ALBASTRU,
     NIMIC
 };
+
+// Functie helper pentru numere aleatoare (inlocuieste rand())
+inline int generareNumarRandom(int min, int max) {
+    static std::mt19937 generator(std::random_device{}());
+    std::uniform_int_distribution<int> distributie(min, max);
+    return distributie(generator);
+}
 
 inline std::string culoareToString(Culoare c)
 {

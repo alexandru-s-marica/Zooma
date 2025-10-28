@@ -3,11 +3,11 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <random>
+// #include <random> // Nu mai e nevoie aici, e in utils.h
 
 int main()
 {
-    std::srand(std::random_device{}());
+    // std::srand(...) // Nu mai e nevoie, noul generator se initializeaza singur
 
     Nivel joc({50, 50}, 25.0f);
     joc.adaugaBileStart();
@@ -54,8 +54,12 @@ int main()
         SirDeBile s1_copie = joc.getSirDeBile();
 
         std::cout << "Test Operator Atribuire (s3 = s1)...\n";
-        [[maybe_unused]] SirDeBile s2_atribuire;
+        SirDeBile s2_atribuire;
         s2_atribuire = joc.getSirDeBile();
+
+        // Aici este MODIFICAREA pentru compatibilitate maxima:
+        (void)s1_copie;
+        (void)s2_atribuire;
 
         std::cout << "Obiectele copie vor fi distruse acum (ies din scope)...\n";
     }
