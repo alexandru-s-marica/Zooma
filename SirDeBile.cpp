@@ -1,7 +1,8 @@
-#include "SirDeBile.h"
+#include "SirDeBile.h" // Include header-ul de mai sus
 
+// Aici vine implementarea (codul)
 SirDeBile::SirDeBile() {
-    idSir = new int(rand());
+    idSir = new int(generareNumarRandom(10000, 99999));
 }
 
 SirDeBile::~SirDeBile() {
@@ -10,8 +11,8 @@ SirDeBile::~SirDeBile() {
 }
 
 SirDeBile::SirDeBile(const SirDeBile& other) {
-    idSir = new int(*other.idSir);
     bile = other.bile;
+    idSir = new int(*other.idSir); // Deep copy
 }
 
 SirDeBile& SirDeBile::operator=(const SirDeBile& other)
@@ -19,9 +20,11 @@ SirDeBile& SirDeBile::operator=(const SirDeBile& other)
     if (this == &other) {
         return *this;
     }
-    delete idSir;
-    idSir = new int(*other.idSir);
+
     bile = other.bile;
+    delete idSir; // Eliberam resursa veche
+    idSir = new int(*other.idSir); // Alocam si copiem resursa noua
+
     return *this;
 }
 
@@ -66,7 +69,7 @@ int SirDeBile::insereazaBila(Bila bilaTrasa, float distantaLovire) {
     count++;
 
     if (count >= 3) {
-        std::cout << ">>> POTRIVIRE DE " << count << " " << culoareToString(c) << "!" << std::endl;
+        std::cout << ">>> POTRIVIRE DE " << count << " " << culoareToString(c) << "!" << std.endl;
         bile.erase(itStanga, std::next(itDreapta));
         return 10 * count;
     }

@@ -1,98 +1,25 @@
-#include "SirDeBile.h"
+#pragma once
+#include "Bila.h"
+#include <list>
 
-SirDeBile::SirDeBile() {
-    // Folosim noul generator de numere
-    idSir = new int(generareNumarRandom(10000, 99999));
-}
+class SirDeBile {
+private:
+    std::list<Bila> bile;
+    int* idSir;
 
-SirDeBile::~SirDeBile() {
-    delete idSir;
-    idSir = nullptr;
-}
+public:
+    // DOAR declaratiile functiilor
+    SirDeBile();
+    ~SirDeBile();
+    SirDeBile(const SirDeBile& other);
+    SirDeBile& operator=(const SirDeBile& other);
 
-SirDeBile::SirDeBile(const SirDeBile& other) {
-    bile = other.bile;
-    idSir = new int(*other.idSir); // Deep copy
-}
+    void adaugaBilaInitiala(const Bila& b);
+    void avanseazaBilele(float distanta);
+    int insereazaBila(Bila bilaTrasa, float distantaLovire);
 
-SirDeBile& SirDeBile::operator=(const SirDeBile& other)
-{
-    if (this == &other) {
-        return *this;
-    }
+    bool eGol() const;
+    bool aAjunsLaFinal(float distantaMaxima) const;
 
-    bile = other.bile;
-    delete idSir; // Eliberam resursa veche
-    idSir = new int(*other.idSir); // Alocam si copiem resursa noua
-
-    return *this;
-}
-
-void SirDeBile::adaugaBilaInitiala(const Bila& b) {
-    bile.push_back(b);
-}
-
-void SirDeBile::avanseazaBilele(float distanta) {
-    if (bile.empty()) return;
-
-    for (auto& bila : bile) {
-        float dNoua = bila.getDistanta() + distanta;
-        bila.setDistanta(dNoua);
-    }
-}
-
-int SirDeBile::insereazaBila(Bila bilaTrasa, float distantaLovire) {
-
-    auto it = bile.begin();
-    while (it != bile.end() && it->getDistanta() < distantaLovire) {
-        ++it;
-    }
-
-    bilaTrasa.setDistanta(distantaLovire);
-    auto itInserat = bile.insert(it, bilaTrasa);
-
-    Culoare c = itInserat->getCuloare();
-    int count = 0;
-
-    auto itStanga = itInserat;
-    while (itStanga != bile.begin() && std::prev(itStanga)->getCuloare() == c) {
-        --itStanga;
-        count++;
-    }
-
-    auto itDreapta = itInserat;
-    while (std::next(itDreapta) != bile.end() && std::next(itDreapta)->getCuloare() == c) {
-        ++itDreapta;
-        count++;
-    }
-
-    count++;
-
-    if (count >= 3) {
-        std::cout << ">>> POTRIVIRE DE " << count << " " << culoareToString(c) << "!" << std::endl;
-        bile.erase(itStanga, std::next(itDreapta));
-        return 10 * count;
-    }
-    return 0;
-}
-
-bool SirDeBile::eGol() const {
-    return bile.empty();
-}
-
-bool SirDeBile::aAjunsLaFinal(float distantaMaxima) const {
-    if (bile.empty()) return false;
-    return bile.back().getDistanta() >= distantaMaxima;
-}
-
-std::ostream& operator<<(std::ostream& os, const SirDeBile& s) {
-    os << "[SirDeBile (ID: " << *s.idSir << "): \n";
-    if (s.bile.empty()) {
-        os << "\t(gol)\n";
-    }
-    for (const auto& b : s.bile) {
-        os << "\t" << b << "\n";
-    }
-    os << "]";
-    return os;
-}
+    friend std::ostream& operator<<(std::ostream& os, const SirDeBile& s);
+};
