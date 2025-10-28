@@ -21,9 +21,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Compile
-        shell: msvc-build-tools-path
+      - name: Compile with MinGW
         run: |
-          cl.exe /EHsc /Fe:zooma.exe *.cpp
+          g++ -std=c++17 -Wall -o zooma.exe *.cpp
       - name: Run (Test)
         run: .\zooma.exe
