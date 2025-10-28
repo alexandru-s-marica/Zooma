@@ -1,6 +1,7 @@
-#include "SirDeBile.h" // Include header-ul de mai sus
+#include "SirDeBile.h"
+#include <iostream>
+#include <iterator>
 
-// Aici vine implementarea (codul)
 SirDeBile::SirDeBile() {
     idSir = new int(generareNumarRandom(10000, 99999));
 }
