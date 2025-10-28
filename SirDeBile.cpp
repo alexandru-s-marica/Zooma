@@ -1,8 +1,9 @@
 #include "SirDeBile.h"
-#include <iostream>
-#include <iterator>
+#include <iostream>   // Adaugat pentru std::cout, std::endl
+#include <iterator>   // Adaugat pentru std::prev, std::next
 
 SirDeBile::SirDeBile() {
+    // Folosim noul generator de numere
     idSir = new int(generareNumarRandom(10000, 99999));
 }
 
@@ -70,7 +71,7 @@ int SirDeBile::insereazaBila(Bila bilaTrasa, float distantaLovire) {
     count++;
 
     if (count >= 3) {
-        std::cout << ">>> POTRIVIRE DE " << count << " " << culoareToString(c) << "!" << std.endl;
+        std::cout << ">>> POTRIVIRE DE " << count << " " << culoareToString(c) << "!" << std::endl;
         bile.erase(itStanga, std::next(itDreapta));
         return 10 * count;
     }

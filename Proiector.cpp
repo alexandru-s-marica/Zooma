@@ -6,7 +6,7 @@ Proiector::Proiector(Point p) : pozitieFixa(p) {
 }
 
 Bila Proiector::genereazaBilaNoua() {
-    // Folosim noul generator de numere
+    // Folosim noul generator de numere din utils.h
     Culoare c = static_cast<Culoare>(generareNumarRandom(0, 2));
     return Bila(c, this->pozitieFixa);
 }

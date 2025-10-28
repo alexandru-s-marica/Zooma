@@ -3,11 +3,10 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-// #include <random> // Nu mai e nevoie aici, e in utils.h
 
 int main()
 {
-    // std::srand(...) // Nu mai e nevoie, noul generator se initializeaza singur
+    // Am scos initializarea rand()
 
     Nivel joc({50, 50}, 25.0f);
     joc.adaugaBileStart();
@@ -57,7 +56,7 @@ int main()
         SirDeBile s2_atribuire;
         s2_atribuire = joc.getSirDeBile();
 
-        // Aici este MODIFICAREA pentru compatibilitate maxima:
+        // MODIFICAREA pentru a opri eroarea de "unused variable" (-Werror)
         (void)s1_copie;
         (void)s2_atribuire;
 
