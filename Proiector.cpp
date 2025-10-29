@@ -15,7 +15,6 @@ void Proiector::incarcaBilaUrmatoare()
 {
     this->bilaCurenta = this->bilaUrmatoare;
     this->bilaUrmatoare = genereazaBilaNoua();
-    this->bilaCurenta.setPozitie(this->pozitieFixa);
 }
 
 Bila Proiector::trageBila() {

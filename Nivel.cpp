@@ -13,7 +13,12 @@ void Nivel::proceseazaComanda(const std::string& comanda, float valoare) {
     }
     else if (comanda == "avanseaza") {
         std::cout << "--- Actiune: Avanseaza " << valoare << " unitati ---\n";
+
+        // 1. Apelam functia de avansare
         sirBile.avanseazaBilele(valoare);
+
+        // 2. Acum avem o sansa de 15% sa aplicam un efect nou
+        sirBile.aplicaEfectAleatoriu(0.15f);
     }
 }
 

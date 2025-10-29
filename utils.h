@@ -22,6 +22,14 @@ enum class Culoare {
     NIMIC
 };
 
+// --- ADAUGAT PENTRU EFECTE ---
+enum class TipPowerUp {
+    NIMIC,
+    BOMBA,
+    INVERSARE
+};
+// ----------------------------
+
 // Functie helper pentru numere aleatoare (inlocuieste rand())
 inline int generareNumarRandom(int min, int max) {
     static std::mt19937 generator(std::random_device{}());
@@ -38,3 +46,14 @@ inline std::string culoareToString(Culoare c)
         default: return "N/A";
     }
 }
+
+// --- ADAUGAT PENTRU EFECTE ---
+inline std::string powerUpToString(TipPowerUp tip)
+{
+    switch (tip) {
+        case TipPowerUp::BOMBA: return "BOMBA";
+        case TipPowerUp::INVERSARE: return "INVERSARE";
+        default: return "";
+    }
+}
+// ----------------------------

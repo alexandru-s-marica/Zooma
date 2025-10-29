@@ -6,6 +6,7 @@ class SirDeBile {
 private:
     std::list<Bila> bile;
     int* idSir;
+    int activeazaEfect(TipPowerUp tip);
 
 public:
     // DOAR declaratiile functiilor
@@ -15,8 +16,9 @@ public:
     SirDeBile& operator=(const SirDeBile& other);
 
     void adaugaBilaInitiala(const Bila& b);
-    void avanseazaBilele(float distanta);
     int insereazaBila(Bila bilaTrasa, float distantaLovire);
+    void avanseazaBilele(float distanta);
+    void aplicaEfectAleatoriu(float sansa);
 
     bool eGol() const;
     bool aAjunsLaFinal(float distantaMaxima) const;
