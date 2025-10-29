@@ -1,6 +1,6 @@
 # Zooma
 
-Joc simplu și rapid de strategie, de tip bubble-shooter, implementat momentan (v0.1) in consolă.
+Joc simplu și rapid de strategie, de tip bubble-shooter, implementat momentan (v0.2) in consolă.
 
 ## Funcționalități utilizate
 
