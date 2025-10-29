@@ -65,18 +65,15 @@ int SirDeBile::insereazaBila(Bila bilaTrasa, float distantaLovire) {
     if (count >= 3) {
         std::cout << ">>> POTRIVIRE DE " << count << " " << culoareToString(c) << "!" << std::endl;
 
-        // --- NOU: Colectam efectele ---
         std::list<TipPowerUp> efecteDeActivat;
-        for (auto it = itStanga; it != std::next(itDreapta); ++it) {
-            if (it->getEfect() != TipPowerUp::NIMIC) {
-                efecteDeActivat.push_back(it->getEfect());
+        for (auto it_efect = itStanga; it_efect != std::next(itDreapta); ++it_efect) {
+            if (it_efect->getEfect() != TipPowerUp::NIMIC) {
+                efecteDeActivat.push_back(it_efect->getEfect());
             }
         }
-        // -----------------------------
 
         bile.erase(itStanga, std::next(itDreapta));
 
-        // --- NOU: Activam efectele ---
         int scorAdaugat = 10 * count;
         for (auto efect : efecteDeActivat) {
             std::cout << "!!! ACTIVARE EFECT: " << powerUpToString(efect) << " !!!" << std::endl;
