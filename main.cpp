@@ -1,44 +1,28 @@
-#include "utils.h"
-#include "Nivel.h"
+#include <SFML/Graphics.hpp>
+#include <iostream>
+#include <variant>
 
-void ruleazaTestareCerinte(const Nivel& nivel) {
-    std::cout << "\n========= INCEPUT TESTARE CERINTE =========\n";
-
-    std::cout << nivel;
-
-    std::cout << "\n--- Testare Constructor de Copiere (SirDeBile) ---\n";
-    SirDeBile sirCopiat = nivel.getSirBile();
-    std::cout << "Sirul copiat:\n" << sirCopiat;
-
-    std::cout << "\n--- Testare Operator= (SirDeBile) ---\n";
-    SirDeBile sirAtribuit = sirCopiat;
-    sirAtribuit.adaugaBilaLaCoada(Culoare::MOV);
-    sirAtribuit = nivel.getSirBile();
-    std::cout << "Sirul atribuit:\n" << sirAtribuit;
-
-    std::cout << "========= SFARSIT TESTARE CERINTE =========\n\n";
-}
+#include "App/GameRenderer.h"
+#include "Core/Nivel.h"
 
 int main() {
-    // CORECTIE: sf::VideoMode ia acum un sf::Vector2u
-    sf::RenderWindow window(sf::VideoMode({SCREEN_WIDTH, SCREEN_HEIGHT}), "Zooma Proiect POO");
+    sf::RenderWindow window(sf::VideoMode({SCREEN_WIDTH, SCREEN_HEIGHT}), "Zooma v0.3");
     window.setFramerateLimit(60);
 
-    Nivel nivel(window);
-
-    ruleazaTestareCerinte(nivel);
+    Nivel nivel(40.f);
+    GameRenderer renderer(window, nivel);
 
     sf::Clock clock;
-
     while (window.isOpen()) {
         float deltaTime = clock.restart().asSeconds();
 
-        nivel.ruleazaFrame(deltaTime);
-        nivel.deseneaza();
+        renderer.handleInput();
+        nivel.ruleazaFrame(deltaTime); // Aici starea se poate schimba în GAME_OVER
 
-        if (nivel.esteTerminat()) {
-            window.close();
-        }
+        // --- APEL NOU ---
+        renderer.actualizeazaStareUI(); // Aici UI-ul reacționează la schimbarea stării
+
+        renderer.draw();
     }
 
     return 0;
