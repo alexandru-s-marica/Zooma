@@ -14,8 +14,6 @@ set(EXT_DIR "ext")
 set(CMAKE_DEBUG_POSTFIX "_d")
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-# --- ÎNCEPUTUL BLOCULUI MODIFICAT ---
-# Setăm flag-urile de warning într-o variabilă
 option(WARNINGS_AS_ERRORS "Treat warnings as errors" ON)
 if (WARNINGS_AS_ERRORS)
     if (MSVC)
@@ -30,7 +28,6 @@ else()
         set(PROJECT_COMPILE_FLAGS -Wall -Wextra -Wpedantic)
     endif()
 endif()
-# --- SFÂRȘITUL BLOCULUI MODIFICAT ---
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${BIN_DIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${BIN_DIR}")
@@ -39,32 +36,34 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${BIN_DIR}")
 enable_testing()
 include(FetchContent)
 
-# Setăm flag-urile de warning DOAR PENTRU ȚINTELE NOASTRE
-# Astfel, ele nu se vor "scurge" în SFML sau Freetype
 add_library(game_core STATIC
         Core/Bila.cpp
         Core/SirDeBile.cpp
         Core/Proiector.cpp
         Core/Nivel.cpp
 )
-target_compile_options(game_core PRIVATE ${PROJECT_COMPILE_FLAGS}) # Aplicăm flag-urile aici
+target_compile_options(game_core PRIVATE ${PROJECT_COMPILE_FLAGS})
 target_include_directories(game_core PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/Core"
 )
 install(TARGETS game_core ARCHIVE DESTINATION ${BIN_DIR})
 
-set(BUILD_REAL_APP OFF)
+# --- ÎNCEPUTUL BLOCULUI MODIFICAT ---
+# Logica este acum mult mai simplă:
+# Construim aplicația reală DOAR dacă NU suntem în CI.
 if(NOT DEFINED ENV{CI})
     set(BUILD_REAL_APP ON)
-elseif(WIN32)
-    set(BUILD_REAL_APP ON)
+else()
+    set(BUILD_REAL_APP OFF)
 endif()
+# --- SFÂRȘITUL BLOCULUI MODIFICAT ---
 
 
 if(BUILD_REAL_APP)
+    message(STATUS "Build: Building REAL application with SFML.")
     set(FETCHCONTENT_QUIET OFF)
     set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
-    set(SFML_WARNINGS_AS_ERRORS OFF) # Spunem SFML-ului să ignore warning-urile
+    set(SFML_WARNINGS_AS_ERRORS OFF)
 
     FetchContent_Declare(
             SFML
@@ -80,7 +79,7 @@ if(BUILD_REAL_APP)
             App/GameRenderer.cpp
             App/MesajUI.cpp
     )
-    target_compile_options(${MAIN_EXECUTABLE_NAME} PRIVATE ${PROJECT_COMPILE_FLAGS}) # Aplicăm flag-urile aici
+    target_compile_options(${MAIN_EXECUTABLE_NAME} PRIVATE ${PROJECT_COMPILE_FLAGS})
 
     target_include_directories(${MAIN_EXECUTABLE_NAME} PUBLIC
             "${CMAKE_CURRENT_SOURCE_DIR}/App"
@@ -99,10 +98,11 @@ if(BUILD_REAL_APP)
     install(TARGETS ${MAIN_EXECUTABLE_NAME} RUNTIME DESTINATION ${BIN_DIR})
 
 else()
+    message(STATUS "Build: Building DUMMY executable for CI.")
     add_executable(${MAIN_EXECUTABLE_NAME}
             Core/mainsecundar.cpp
     )
-    target_compile_options(${MAIN_EXECUTABLE_NAME} PRIVATE ${PROJECT_COMPILE_FLAGS}) # Aplicăm flag-urile aici
+    target_compile_options(${MAIN_EXECUTABLE_NAME} PRIVATE ${PROJECT_COMPILE_FLAGS})
 
     install(TARGETS ${MAIN_EXECUTABLE_NAME} RUNTIME DESTINATION ${BIN_DIR})
 
