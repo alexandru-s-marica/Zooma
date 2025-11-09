@@ -33,7 +33,7 @@ void Proiector::schimbaBila() {
 }
 
 void Proiector::rotesteSpre(Vec2f tinta) {
-    // (void)tinta;
+    (void)tinta; // Suprimă avertismentul de parametru nefolosit
 }
 
 Vec2f Proiector::getPozitie() const {
