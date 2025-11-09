@@ -48,15 +48,10 @@ target_include_directories(game_core PUBLIC
 )
 install(TARGETS game_core ARCHIVE DESTINATION ${BIN_DIR})
 
-# --- ÎNCEPUTUL BLOCULUI MODIFICAT ---
-# Logica este acum mult mai simplă:
-# Construim aplicația reală DOAR dacă NU suntem în CI.
+set(BUILD_REAL_APP OFF)
 if(NOT DEFINED ENV{CI})
     set(BUILD_REAL_APP ON)
-else()
-    set(BUILD_REAL_APP OFF)
 endif()
-# --- SFÂRȘITUL BLOCULUI MODIFICAT ---
 
 
 if(BUILD_REAL_APP)
@@ -107,6 +102,14 @@ else()
     install(TARGETS ${MAIN_EXECUTABLE_NAME} RUNTIME DESTINATION ${BIN_DIR})
 
 endif()
+
+# --- ADAUGĂ ACEST BLOC ---
+# Asigură-te că launcher-ul este instalat pe macOS
+# indiferent dacă build-ul este real sau fals
+if(APPLE)
+    install(FILES launcher.command DESTINATION ${BIN_DIR})
+endif()
+# --- SFÂRȘIT BLOC NOU ---
 
 if(MINGW)
     get_filename_component(MINGW_COMPILER_BIN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
