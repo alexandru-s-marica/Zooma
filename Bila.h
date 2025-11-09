@@ -1,25 +1,20 @@
 #pragma once
 #include "utils.h"
 
-class Bila
-{
+class Bila {
 private:
+    sf::CircleShape forma;
     Culoare culoare;
-    Point pozitie;
-    float distantaPeTraseu;
-    TipPowerUp efectSpecial; // ATRIBUTUL NOU
+    sf::Vector2f pozitie;
 
 public:
-    Bila(Culoare c, Point p, float dist = 0.0f);
-    Bila();
+    Bila(Culoare c, sf::Vector2f pos);
 
+    void deseneaza(sf::RenderWindow& window) const;
+    void setPozitie(sf::Vector2f pos);
+    sf::Vector2f getPozitie() const;
     Culoare getCuloare() const;
-    float getDistanta() const;
-    void setDistanta(float d);
-
-    // Functii noi pentru efecte
-    TipPowerUp getEfect() const;
-    void aplicaEfect(TipPowerUp tip);
+    sf::FloatRect getBounds() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Bila& b);
 };

@@ -3,16 +3,25 @@
 
 class Proiector {
 private:
+    sf::Vector2f pozitie;
+    // sf::Sprite sprite;
+    // sf::Texture textura;
+    float unghi;
+
     Bila bilaCurenta;
     Bila bilaUrmatoare;
-    Point pozitieFixa;
 
-    Bila genereazaBilaNoua();
+    Culoare genereazaCuloareRandom();
 
 public:
-    explicit Proiector(Point p = {0, 0});
-    Bila trageBila();
-    void incarcaBilaUrmatoare();
+    Proiector(sf::Vector2f pos);
+
+    void rotesteSpre(sf::Vector2f mousePos);
+    Bila trage();
+    void schimbaBila();
+
+    void deseneaza(sf::RenderWindow& window) const;
+    sf::Vector2f getPozitie() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Proiector& p);
 };

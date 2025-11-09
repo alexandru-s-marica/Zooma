@@ -1,4 +1,1 @@
-* text=auto eol=lf
-
 ext/** linguist-vendored
-.github/workflows/* linguist-vendored

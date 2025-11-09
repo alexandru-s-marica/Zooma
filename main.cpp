@@ -1,24 +1,44 @@
-#include <SFML/Graphics.hpp>
+#include "utils.h"
+#include "Nivel.h"
+
+void ruleazaTestareCerinte(const Nivel& nivel) {
+    std::cout << "\n========= INCEPUT TESTARE CERINTE =========\n";
+
+    std::cout << nivel;
+
+    std::cout << "\n--- Testare Constructor de Copiere (SirDeBile) ---\n";
+    SirDeBile sirCopiat = nivel.getSirBile();
+    std::cout << "Sirul copiat:\n" << sirCopiat;
+
+    std::cout << "\n--- Testare Operator= (SirDeBile) ---\n";
+    SirDeBile sirAtribuit = sirCopiat;
+    sirAtribuit.adaugaBilaLaCoada(Culoare::MOV);
+    sirAtribuit = nivel.getSirBile();
+    std::cout << "Sirul atribuit:\n" << sirAtribuit;
+
+    std::cout << "========= SFARSIT TESTARE CERINTE =========\n\n";
+}
 
 int main() {
-    // Creează o fereastră
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Test SFML");
+    // CORECTIE: sf::VideoMode ia acum un sf::Vector2u
+    sf::RenderWindow window(sf::VideoMode({SCREEN_WIDTH, SCREEN_HEIGHT}), "Zooma Proiect POO");
+    window.setFramerateLimit(60);
 
-    // O formă simplă pentru test
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+    Nivel nivel(window);
 
-    // Bucla principală a jocului
+    ruleazaTestareCerinte(nivel);
+
+    sf::Clock clock;
+
     while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
+        float deltaTime = clock.restart().asSeconds();
 
-        window.clear();
-        window.draw(shape);
-        window.display();
+        nivel.ruleazaFrame(deltaTime);
+        nivel.deseneaza();
+
+        if (nivel.esteTerminat()) {
+            window.close();
+        }
     }
 
     return 0;

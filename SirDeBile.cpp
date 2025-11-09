@@ -1,168 +1,115 @@
 #include "SirDeBile.h"
-#include <iostream>   // Adaugat pentru std::cout, std::endl
-#include <iterator>   // Adaugat pentru std::prev, std::next
 
-SirDeBile::SirDeBile() {
-    // Folosim noul generator de numere
-    idSir = new int(generareNumarRandom(10000, 99999));
+SirDeBile::SirDeBile() : viteza(0.f), progresCapSnake(0.f) {
+    std::cout << "SirDeBile: Constructor default\n";
 }
 
-SirDeBile::~SirDeBile() {
-    delete idSir;
-    idSir = nullptr;
+SirDeBile::SirDeBile(std::vector<sf::Vector2f> traseu, float viteza)
+    : traseu(std::move(traseu)), viteza(viteza), progresCapSnake(0.f) {
+    std::cout << "SirDeBile: Constructor cu parametri\n";
+    adaugaBilaLaCoada(Culoare::ROSU);
+    adaugaBilaLaCoada(Culoare::ROSU);
+    adaugaBilaLaCoada(Culoare::VERDE);
+    adaugaBilaLaCoada(Culoare::ALBASTRU);
+    adaugaBilaLaCoada(Culoare::VERDE);
 }
 
 SirDeBile::SirDeBile(const SirDeBile& other)
-    : bile(other.bile)
-{
-    idSir = new int(*other.idSir);
+    : bile(other.bile), traseu(other.traseu), viteza(other.viteza), progresCapSnake(other.progresCapSnake) {
+    std::cout << "SirDeBile: Constructor de copiere\n";
 }
 
-SirDeBile& SirDeBile::operator=(const SirDeBile& other)
-{
-    if (this == &other) {
-        return *this;
+SirDeBile& SirDeBile::operator=(const SirDeBile& other) {
+    std::cout << "SirDeBile: Operator= de copiere\n";
+    if (this != &other) {
+        bile = other.bile;
+        traseu = other.traseu;
+        viteza = other.viteza;
+        progresCapSnake = other.progresCapSnake;
     }
-
-    bile = other.bile;
-    delete idSir; // Eliberam resursa veche
-    idSir = new int(*other.idSir); // Alocam si copiem resursa noua
-
     return *this;
 }
 
-void SirDeBile::adaugaBilaInitiala(const Bila& b) {
-    bile.push_back(b);
+SirDeBile::~SirDeBile() {
+    std::cout << "SirDeBile: Destructor\n";
 }
 
-int SirDeBile::insereazaBila(Bila bilaTrasa, float distantaLovire) {
+void SirDeBile::actualizeaza(float deltaTime) {
+    progresCapSnake += viteza * deltaTime;
 
-    auto it = bile.begin();
-    while (it != bile.end() && it->getDistanta() < distantaLovire) {
-        ++it;
+    float progresCurent = progresCapSnake;
+    for (auto& bila : bile) {
+        // Logica de mișcare e simplificată; o implementare reală
+        // ar trebui să interpoleze de-a lungul vectorului 'traseu'
+        bila.setPozitie(getPozitiePeTraseu(progresCurent));
+        progresCurent -= (2 * RAZA_BILA); // Spațiere între bile
+    }
+}
+
+int SirDeBile::insereazaSiVerifica(std::list<Bila>::iterator it, const Bila& bilaNoua) {
+    auto pozInserata = bile.insert(it, bilaNoua);
+
+    Culoare c = pozInserata->getCuloare();
+    std::vector<std::list<Bila>::iterator> potriviri;
+    potriviri.push_back(pozInserata);
+
+    auto st = pozInserata;
+    while (st != bile.begin()) {
+        --st;
+        if (st->getCuloare() == c) potriviri.push_back(st);
+        else break;
     }
 
-    bilaTrasa.setDistanta(distantaLovire);
-    auto itInserat = bile.insert(it, bilaTrasa);
-
-    Culoare c = itInserat->getCuloare();
-    int count = 0;
-
-    auto itStanga = itInserat;
-    while (itStanga != bile.begin() && std::prev(itStanga)->getCuloare() == c) {
-        --itStanga;
-        count++;
+    auto dr = pozInserata;
+    ++dr;
+    while (dr != bile.end()) {
+        if (dr->getCuloare() == c) potriviri.push_back(dr);
+        else break;
+        ++dr;
     }
 
-    auto itDreapta = itInserat;
-    while (std::next(itDreapta) != bile.end() && std::next(itDreapta)->getCuloare() == c) {
-        ++itDreapta;
-        count++;
-    }
-
-    count++;
-
-    if (count >= 3) {
-        std::cout << ">>> POTRIVIRE DE " << count << " " << culoareToString(c) << "!" << std::endl;
-
-        std::list<TipPowerUp> efecteDeActivat;
-        for (auto it_efect = itStanga; it_efect != std::next(itDreapta); ++it_efect) {
-            if (it_efect->getEfect() != TipPowerUp::NIMIC) {
-                efecteDeActivat.push_back(it_efect->getEfect());
-            }
+    if (potriviri.size() >= 3) {
+        for (auto& p : potriviri) {
+            bile.erase(p);
         }
-
-        bile.erase(itStanga, std::next(itDreapta));
-
-        int scorAdaugat = 10 * count;
-        for (auto efect : efecteDeActivat) {
-            std::cout << "!!! ACTIVARE EFECT: " << powerUpToString(efect) << " !!!" << std::endl;
-            scorAdaugat += activeazaEfect(efect); // Adaugam scorul bonus din efect
-        }
-
-        return scorAdaugat;
+        return (int)potriviri.size();
     }
     return 0;
 }
 
-bool SirDeBile::eGol() const {
-    return bile.empty();
+void SirDeBile::adaugaBilaLaCoada(Culoare c) {
+    float progres = progresCapSnake - (bile.size() * 2 * RAZA_BILA);
+    if (progres < 0.f) progres = 0.f;
+    bile.emplace_back(c, getPozitiePeTraseu(progres));
 }
 
-bool SirDeBile::aAjunsLaFinal(float distantaMaxima) const {
-    if (bile.empty()) return false;
-    return bile.back().getDistanta() >= distantaMaxima;
-}
-
-// Functia de avansare simpla (folosita de power-up si de Nivel)
-void SirDeBile::avanseazaBilele(float distanta) {
-    if (bile.empty()) return;
-    for (auto& bila : bile) {
-        float dNoua = bila.getDistanta() + distanta;
-        if (dNoua < 0) dNoua = 0; // Prevenim sa mearga sub 0
-        bila.setDistanta(dNoua);
+void SirDeBile::deseneaza(sf::RenderWindow& window) const {
+    for (const auto& bila : bile) {
+        bila.deseneaza(window);
     }
 }
 
-// Functia care aplica un efect nou pe o bila aleatorie
-void SirDeBile::aplicaEfectAleatoriu(float sansa)
-{
-    if (bile.empty()) return;
-
-    // sansa este intre 0.0 si 1.0 (ex. 0.1 pt 10%)
-    if (generareNumarRandom(0, 100) < (sansa * 100))
-    {
-        // Alegem o bila aleatorie
-        int index = generareNumarRandom(0, bile.size() - 1);
-        auto it = bile.begin();
-        std::advance(it, index);
-
-        // Aplicam efectul doar daca bila nu are deja unul
-        if (it->getEfect() == TipPowerUp::NIMIC) {
-            // Genereaza 1 (BOMBA) sau 2 (INVERSARE)
-            TipPowerUp tipNou = static_cast<TipPowerUp>(generareNumarRandom(1, 2));
-            it->aplicaEfect(tipNou);
-            std::cout << ">>> O bila a primit un efect: " << powerUpToString(tipNou) << std::endl;
-        }
-    }
+std::list<Bila>& SirDeBile::getBile() {
+    return bile;
 }
 
-// Functia private care executa logica efectului
-int SirDeBile::activeazaEfect(TipPowerUp tip) {
-    switch (tip)
-    {
-        case TipPowerUp::BOMBA:
-        {
-            // Distruge primele 3 bile de la capatul sirului
-            int bileDistruse = 0;
-            for (int i = 0; i < 3 && !bile.empty(); ++i) {
-                bile.pop_front(); // Sterge bila cea mai din fata
-                bileDistruse++;
-            }
-            std::cout << "Bomba a distrus " << bileDistruse << " bile de la capatul sirului!\n";
-            return bileDistruse * 5; // Scor bonus
-        }
-        case TipPowerUp::INVERSARE:
-        {
-            // Impinge tot sirul inapoi cu 15 unitati
-            avanseazaBilele(-15.0f);
-            std::cout << "Sirul a fost impins inapoi cu 15 unitati!\n";
-            return 20; // Scor bonus
-        }
-        case TipPowerUp::NIMIC:
-        default:
-            return 0;
+sf::Vector2f SirDeBile::getPozitiePeTraseu(float progres) const {
+    if (traseu.empty()) return {0, 0};
+    // Implementare foarte simplistă a traseului
+    int index = static_cast<int>(progres / 10.f);
+    if (index >= traseu.size()) {
+        return traseu.back(); // A ajuns la capăt
     }
+    if (index < 0) {
+        return traseu.front();
+    }
+    return traseu[index];
 }
 
 std::ostream& operator<<(std::ostream& os, const SirDeBile& s) {
-    os << "[SirDeBile (ID: " << *s.idSir << "): \n";
-    if (s.bile.empty()) {
-        os << "\t(gol)\n";
-    }
+    os << "SirDeBile cu " << s.bile.size() << " bile:\n";
     for (const auto& b : s.bile) {
         os << "\t" << b << "\n";
     }
-    os << "]";
     return os;
 }

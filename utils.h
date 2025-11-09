@@ -1,59 +1,32 @@
 #pragma once
 
 #include <iostream>
-#include <string>
 #include <vector>
 #include <list>
-#include <fstream>
-#include <sstream>
-#include <cstdlib>
-#include <ctime>
-#include <random> // Adaugat pentru C++ modern random
+#include <cmath>
+#include <memory>
+#include <SFML/Graphics.hpp>
 
-struct Point {
-    float x=0.0f;
-    float y = 0.0f;
-};
+const float RAZA_BILA = 15.f;
+const int SCREEN_WIDTH = 1024;
+const int SCREEN_HEIGHT = 768;
 
 enum class Culoare {
     ROSU,
     VERDE,
     ALBASTRU,
-    NIMIC
+    GALBEN,
+    MOV,
+    NONE
 };
 
-// --- ADAUGAT PENTRU EFECTE ---
-enum class TipPowerUp {
-    NIMIC,
-    BOMBA,
-    INVERSARE
-};
-// ----------------------------
-
-// Functie helper pentru numere aleatoare (inlocuieste rand())
-inline int generareNumarRandom(int min, int max) {
-    static std::mt19937 generator(std::random_device{}());
-    std::uniform_int_distribution<int> distributie(min, max);
-    return distributie(generator);
-}
-
-inline std::string culoareToString(Culoare c)
-{
+static sf::Color getSfmlColor(Culoare c) {
     switch (c) {
-        case Culoare::ROSU: return "Rosu";
-        case Culoare::VERDE: return "Verde";
-        case Culoare::ALBASTRU: return "Albastru";
-        default: return "N/A";
+        case Culoare::ROSU: return sf::Color::Red;
+        case Culoare::VERDE: return sf::Color::Green;
+        case Culoare::ALBASTRU: return sf::Color::Blue;
+        case Culoare::GALBEN: return sf::Color::Yellow;
+        case Culoare::MOV: return sf::Color::Magenta;
+        default: return sf::Color::Black;
     }
 }
-
-// --- ADAUGAT PENTRU EFECTE ---
-inline std::string powerUpToString(TipPowerUp tip)
-{
-    switch (tip) {
-        case TipPowerUp::BOMBA: return "BOMBA";
-        case TipPowerUp::INVERSARE: return "INVERSARE";
-        default: return "";
-    }
-}
-// ----------------------------

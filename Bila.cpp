@@ -1,38 +1,37 @@
 #include "Bila.h"
-#include <ostream> // Adaugat pentru `ostream`
 
-Bila::Bila(Culoare c, Point p, float dist)
-    : culoare(c), pozitie(p), distantaPeTraseu(dist), efectSpecial(TipPowerUp::NIMIC) {}
-
-Bila::Bila()
-    : culoare(Culoare::NIMIC), pozitie({0,0}), distantaPeTraseu(0), efectSpecial(TipPowerUp::NIMIC) {}
-
-Culoare Bila::getCuloare() const { return culoare; }
-float Bila::getDistanta() const { return distantaPeTraseu; }
-
-void Bila::setDistanta(float d) {
-    distantaPeTraseu = d;
+Bila::Bila(Culoare c, sf::Vector2f pos)
+    : culoare(c), pozitie(pos) {
+    forma.setRadius(RAZA_BILA);
+    forma.setFillColor(getSfmlColor(c));
+    // CORECTIE: setOrigin ia acum un sf::Vector2f
+    forma.setOrigin({RAZA_BILA, RAZA_BILA});
+    forma.setPosition(pozitie);
 }
 
-// --- FUNCTII NOI ---
-TipPowerUp Bila::getEfect() const {
-    return efectSpecial;
+void Bila::deseneaza(sf::RenderWindow& window) const {
+    window.draw(forma);
 }
 
-void Bila::aplicaEfect(TipPowerUp tip) {
-    efectSpecial = tip;
+void Bila::setPozitie(sf::Vector2f pos) {
+    this->pozitie = pos;
+    forma.setPosition(pos);
 }
-// -------------------
+
+sf::Vector2f Bila::getPozitie() const {
+    return pozitie;
+}
+
+Culoare Bila::getCuloare() const {
+    return culoare;
+}
+
+sf::FloatRect Bila::getBounds() const {
+    return forma.getGlobalBounds();
+}
 
 std::ostream& operator<<(std::ostream& os, const Bila& b) {
-    os << "[Bila: " << culoareToString(b.culoare)
-       << " | Dist: " << b.distantaPeTraseu;
-
-    // Afisam efectul daca exista
-    if (b.efectSpecial != TipPowerUp::NIMIC) {
-        os << " | Efect: " << powerUpToString(b.efectSpecial);
-    }
-
-    os << "]";
+    os << "Bila(Culoare: " << static_cast<int>(b.culoare)
+       << ", Poz: " << b.pozitie.x << "," << b.pozitie.y << ")";
     return os;
 }
