@@ -24,7 +24,7 @@ private:
 
 public:
     Nivel();
-    Nivel(float initialBallSpacing);
+    explicit Nivel(float initialBallSpacing);
 
     void ruleazaFrame(float deltaTime);
     void adaugaProiectil(const Bila& p, const Vec2f& dir);

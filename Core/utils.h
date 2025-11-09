@@ -3,7 +3,6 @@
 #include <iostream>
 #include <cmath>
 
-// Structură generică pentru poziție/vector
 struct Vec2f {
     float x;
     float y;
@@ -12,6 +11,8 @@ struct Vec2f {
     Vec2f operator-(const Vec2f& other) const { return {x - other.x, y - other.y}; }
     Vec2f operator*(float scalar) const { return {x * scalar, y * scalar}; }
     float magnitude() const { return std::sqrt(x*x + y*y); }
+
+    // cppcheck-suppress unusedFunction
     Vec2f normalize() const { float mag = magnitude(); return {x / mag, y / mag}; }
 };
 

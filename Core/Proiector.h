@@ -13,7 +13,7 @@ private:
     void genereazaBilaNoua();
 
 public:
-    Proiector(Vec2f pos);
+    explicit Proiector(Vec2f pos);
 
     Bila trage();
     void schimbaBila();

@@ -28,27 +28,29 @@ Bila Proiector::trage() {
     return bilaTrasa;
 }
 
+// cppcheck-suppress unusedFunction
 void Proiector::schimbaBila() {
     std::swap(bilaCurenta, bilaUrmatoare);
 }
 
+// cppcheck-suppress unusedFunction
 void Proiector::rotesteSpre(Vec2f tinta) {
-    (void)tinta; // Suprimă avertismentul de parametru nefolosit
+    (void)tinta;
 }
 
 Vec2f Proiector::getPozitie() const {
     return pozitie;
 }
 
+// cppcheck-suppress unusedFunction
 const Bila& Proiector::getBilaCurenta() const {
     return bilaCurenta;
 }
 
-// --- ADAUGĂ FUNCȚIA ASTA ---
+// cppcheck-suppress unusedFunction
 const Bila& Proiector::getBilaUrmatoare() const {
     return bilaUrmatoare;
 }
-// --- SFÂRȘIT ADAUGARE ---
 
 std::ostream& Proiector::operator<<(std::ostream& os) const {
     os << "Proiector (Pozitie: " << pozitie << ", Bila Curenta: " << bilaCurenta.getCuloare() << ", Bila Urmatoare: " << bilaUrmatoare.getCuloare() << ")";

@@ -1,7 +1,6 @@
 #include "Nivel.h"
 #include <cmath>
 
-// --- IMPLEMENTARE LIPSĂ ---
 void Nivel::genereazaTraseu() {
     traseu.clear();
     for (int i = 0; i < 200; ++i) traseu.push_back({100.f + i * 3, 100.f});
@@ -19,7 +18,6 @@ Nivel::Nivel()
     std::cout << "Nivel: Constructor default (pentru CI/tests)\n";
     genereazaTraseu();
 }
-
 
 Nivel::Nivel(float initialBallSpacing)
     : proiector({SCREEN_WIDTH / 2.f, SCREEN_HEIGHT - 100.f}),
@@ -57,8 +55,8 @@ void Nivel::ruleazaFrame(float deltaTime) {
     }
 }
 
-// --- IMPLEMENTARE LIPSĂ ---
 void Nivel::gestioneazaColiziuni() {
+    // cppcheck-suppress constVariableReference
     auto& bileSir = sirBile.getBile();
 
     auto it_proiectil = proiectileInZbor.begin();
@@ -83,16 +81,17 @@ void Nivel::gestioneazaColiziuni() {
     }
 }
 
-// --- IMPLEMENTARE LIPSĂ ---
+// cppcheck-suppress unusedFunction
 void Nivel::adaugaProiectil(const Bila& p, const Vec2f& dir) {
     proiectileInZbor.push_back({p, dir});
 }
 
-// --- IMPLEMENTARE LIPSĂ ---
+// cppcheck-suppress unusedFunction
 const std::list<Bila>& Nivel::getSirDeBile() const {
     return sirBile.getBile();
 }
 
+// cppcheck-suppress unusedFunction
 Proiector& Nivel::getProiector() {
     return proiector;
 }
@@ -101,19 +100,22 @@ const Proiector& Nivel::getProiector() const {
     return proiector;
 }
 
-// --- IMPLEMENTARE LIPSĂ ---
+// cppcheck-suppress unusedFunction
 const std::list<std::pair<Bila, Vec2f>>& Nivel::getProiectileInZbor() const {
     return proiectileInZbor;
 }
 
+// cppcheck-suppress unusedFunction
 int Nivel::getScor() const {
     return scor;
 }
 
+// cppcheck-suppress unusedFunction
 StareJoc Nivel::getStareJoc() const {
     return stare;
 }
 
+// cppcheck-suppress unusedFunction
 bool Nivel::esteTerminat() const {
     return stare == StareJoc::GAME_OVER;
 }

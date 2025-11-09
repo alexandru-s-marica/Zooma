@@ -39,7 +39,6 @@ SirDeBile::SirDeBile(const SirDeBile& other)
     std::cout << "SirDeBile: Copy constructor\n";
 }
 
-// --- IMPLEMENTARE LIPSĂ ---
 SirDeBile& SirDeBile::operator=(const SirDeBile& other) {
     std::cout << "SirDeBile: Assignment operator\n";
     if (this != &other) {
@@ -53,7 +52,6 @@ SirDeBile& SirDeBile::operator=(const SirDeBile& other) {
     return *this;
 }
 
-// --- IMPLEMENTARE LIPSĂ ---
 SirDeBile::~SirDeBile() {
     std::cout << "SirDeBile: Destructor\n";
 }
@@ -67,7 +65,9 @@ Vec2f SirDeBile::getPozitiePeTraseu(float progres) const {
     float distantaCurenta = 0;
     for (size_t i = 0; i < traseu.size() - 1; ++i) {
         float lungimeSegment = (traseu[i+1] - traseu[i]).magnitude();
-        if (progres <= distantaCurenta + lungimeSegment || i == traseu.size() - 2) {
+        // Folosim o mică toleranță (epsilon) pentru a preveni erorile de floating point
+        float epsilon = 0.001f;
+        if (progres <= (distantaCurenta + lungimeSegment + epsilon)) {
             float progresInSegment = progres - distantaCurenta;
             float t = (lungimeSegment > 0) ? (progresInSegment / lungimeSegment) : 0.f;
             return traseu[i] + (traseu[i+1] - traseu[i]) * t;
@@ -77,7 +77,6 @@ Vec2f SirDeBile::getPozitiePeTraseu(float progres) const {
     return traseu.back();
 }
 
-// --- IMPLEMENTARE LIPSĂ ---
 void SirDeBile::actualizeaza(float deltaTime) {
     progresCapSnake += viteza * deltaTime;
 
@@ -135,6 +134,7 @@ int SirDeBile::insereazaSiVerifica(std::list<Bila>::iterator it_target, const Bi
 }
 
 bool SirDeBile::aAtingJucatorulSfarsitul() const {
+    // float progresCoada = progresCapSnake - (bile.size() - 1) * distantaIntreBile; // Avertisment 'unused'
     return (progresCapSnake >= lungimeTotalaTraseu) && (lungimeTotalaTraseu > 0);
 }
 

@@ -15,6 +15,7 @@ Culoare Bila::getCuloare() const {
     return culoare;
 }
 
+// cppcheck-suppress unusedFunction
 float Bila::getRaza() const {
     return raza;
 }

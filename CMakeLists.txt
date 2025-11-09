@@ -14,20 +14,23 @@ set(EXT_DIR "ext")
 set(CMAKE_DEBUG_POSTFIX "_d")
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
+# --- ÎNCEPUTUL BLOCULUI MODIFICAT ---
+# Setăm flag-urile de warning într-o variabilă
 option(WARNINGS_AS_ERRORS "Treat warnings as errors" ON)
 if (WARNINGS_AS_ERRORS)
     if (MSVC)
-        add_compile_options(/W4 /WX)
+        set(PROJECT_COMPILE_FLAGS /W4 /WX)
     else()
-        add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+        set(PROJECT_COMPILE_FLAGS -Wall -Wextra -Wpedantic -Werror)
     endif()
 else()
     if (MSVC)
-        add_compile_options(/W4)
+        set(PROJECT_COMPILE_FLAGS /W4)
     else()
-        add_compile_options(-Wall -Wextra -Wpedantic)
+        set(PROJECT_COMPILE_FLAGS -Wall -Wextra -Wpedantic)
     endif()
 endif()
+# --- SFÂRȘITUL BLOCULUI MODIFICAT ---
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${BIN_DIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${BIN_DIR}")
@@ -36,17 +39,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${BIN_DIR}")
 enable_testing()
 include(FetchContent)
 
+# Setăm flag-urile de warning DOAR PENTRU ȚINTELE NOASTRE
+# Astfel, ele nu se vor "scurge" în SFML sau Freetype
 add_library(game_core STATIC
         Core/Bila.cpp
         Core/SirDeBile.cpp
         Core/Proiector.cpp
         Core/Nivel.cpp
-        Core/utils.h
-        Core/Bila.h
-        Core/SirDeBile.h
-        Core/Proiector.h
-        Core/Nivel.h
 )
+target_compile_options(game_core PRIVATE ${PROJECT_COMPILE_FLAGS}) # Aplicăm flag-urile aici
 target_include_directories(game_core PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/Core"
 )
@@ -63,7 +64,7 @@ endif()
 if(BUILD_REAL_APP)
     set(FETCHCONTENT_QUIET OFF)
     set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
-    set(SFML_WARNINGS_AS_ERRORS OFF)
+    set(SFML_WARNINGS_AS_ERRORS OFF) # Spunem SFML-ului să ignore warning-urile
 
     FetchContent_Declare(
             SFML
@@ -77,10 +78,9 @@ if(BUILD_REAL_APP)
     add_executable(${MAIN_EXECUTABLE_NAME}
             main.cpp
             App/GameRenderer.cpp
-            App/GameRenderer.h
             App/MesajUI.cpp
-            App/MesajUI.h
     )
+    target_compile_options(${MAIN_EXECUTABLE_NAME} PRIVATE ${PROJECT_COMPILE_FLAGS}) # Aplicăm flag-urile aici
 
     target_include_directories(${MAIN_EXECUTABLE_NAME} PUBLIC
             "${CMAKE_CURRENT_SOURCE_DIR}/App"
@@ -102,6 +102,7 @@ else()
     add_executable(${MAIN_EXECUTABLE_NAME}
             Core/mainsecundar.cpp
     )
+    target_compile_options(${MAIN_EXECUTABLE_NAME} PRIVATE ${PROJECT_COMPILE_FLAGS}) # Aplicăm flag-urile aici
 
     install(TARGETS ${MAIN_EXECUTABLE_NAME} RUNTIME DESTINATION ${BIN_DIR})
 
