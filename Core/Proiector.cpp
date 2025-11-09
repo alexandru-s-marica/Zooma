@@ -1,6 +1,7 @@
 #include "Proiector.h"
 #include <ctime>
 
+// CORECȚIE: Am scos 'explicit' de la începutul liniei
 Proiector::Proiector(Vec2f pos)
     : pozitie(pos),
       bilaCurenta(Culoare::UNKNOWN, pos, 20.f),
@@ -21,6 +22,7 @@ void Proiector::genereazaBilaNoua() {
     }
 }
 
+// cppcheck-suppress unusedFunction
 Bila Proiector::trage() {
     Bila bilaTrasa = bilaCurenta;
     bilaCurenta = bilaUrmatoare;
@@ -38,6 +40,7 @@ void Proiector::rotesteSpre(Vec2f tinta) {
     (void)tinta;
 }
 
+// cppcheck-suppress unusedFunction
 Vec2f Proiector::getPozitie() const {
     return pozitie;
 }

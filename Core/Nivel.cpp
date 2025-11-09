@@ -19,6 +19,7 @@ Nivel::Nivel()
     genereazaTraseu();
 }
 
+// CORECȚIE: Am scos 'explicit' de la începutul liniei
 Nivel::Nivel(float initialBallSpacing)
     : proiector({SCREEN_WIDTH / 2.f, SCREEN_HEIGHT - 100.f}),
       scor(0),
@@ -29,6 +30,7 @@ Nivel::Nivel(float initialBallSpacing)
     sirBile = SirDeBile(traseu, 40.f, initialBallSpacing);
 }
 
+// cppcheck-suppress unusedFunction
 void Nivel::ruleazaFrame(float deltaTime) {
     if (stare == StareJoc::GAME_OVER) {
         return;
