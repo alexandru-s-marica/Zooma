@@ -110,9 +110,13 @@ if(NOT DEFINED ENV{CI})
 
 else()
     message(STATUS "CI build detected. Building core logic ONLY. Full application will not be built.")
-    # Pe CI, nu construim executabilul care depinde de SFML.
-    # Doar biblioteca 'game_core' va fi compilată și poate fi testată ulterior.
-    # Dacă ai teste unitare pentru "game_core", le poți rula aici.
+
+    # Spunem CMake să instaleze artefactul bibliotecii (libgame_core_d.a)
+    # în directorul 'bin' (așa cum se așteaptă scriptul de CI 'Move artifacts')
+    install(TARGETS game_core
+            ARCHIVE DESTINATION ${BIN_DIR}
+    )
+
 endif()
 
 if(MINGW)
