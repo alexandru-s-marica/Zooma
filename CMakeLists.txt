@@ -45,11 +45,8 @@ endif()
 
 ###############################################################################
 
-### MODIFICARE CHEIE ###
 # Setăm flag-urile de compilare GLOBALE (inclusiv ASan) AICI.
-# Facem asta înainte de `FetchContent`, astfel încât SFML să moștenească
-# aceste setări (în special /fsanitize=address pe MSVC).
-# Am corectat și typo-ul: "RUN_SANITERS" -> "RUN_SANITIZERS"
+# Facem asta înainte de `FetchContent`.
 set_compiler_flags(RUN_SANITIZERS TRUE)
 ###############################################################################
 
@@ -72,11 +69,11 @@ if(BUILD_REAL_APP)
             GIT_SHALLOW    1
     )
 
-    # Acum, când SFML este configurat, va prelua flag-urile ASan
     FetchContent_MakeAvailable(SFML)
     find_package(Threads REQUIRED)
 
-    # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
+    ### MODIFICAT ###
+    # Am re-adăugat 'App/MesajUI.cpp'
     add_executable(${MAIN_EXECUTABLE_NAME}
             main.cpp
             App/GameRenderer.cpp
@@ -96,7 +93,7 @@ if(BUILD_REAL_APP)
             Threads::Threads
     )
 
-    # use SYSTEM so cppcheck and clang-tidy do not report warnings from these directories
+    # ... (setări SFML) ...
     target_include_directories(${MAIN_EXECUTABLE_NAME} SYSTEM PRIVATE ${SFML_SOURCE_DIR}/include)
     target_link_directories(${MAIN_EXECUTABLE_NAME} PRIVATE ${SFML_BINARY_DIR}/lib)
 
@@ -108,18 +105,18 @@ if(BUILD_REAL_APP)
         endif()
     endif()
 
-    # Aplicăm flag-uri specifice țintelor noastre (dacă e nevoie)
     set_compiler_flags(TARGET_NAMES ${MAIN_EXECUTABLE_NAME} game_core)
 
-    # copy binaries to "bin" folder
     install(TARGETS ${MAIN_EXECUTABLE_NAME} DESTINATION ${DESTINATION_DIR})
     if(APPLE)
         install(FILES launcher.command DESTINATION ${DESTINATION_DIR})
     endif()
 
-    copy_files(FILES tastatura.txt COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
+    ### MODIFICAT ###
+    # Am re-adăugat 'arial.ttf' (presupunând că l-ai adăugat în proiect)
+    copy_files(FILES tastatura.txt arial.ttf COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
 
-    # Adăugăm pasul de copiere a DLL-urilor pentru MinGW
+    # ... (logica if(MINGW)) ...
     if(MINGW)
         get_filename_component(MINGW_COMPILER_BIN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
         set(RUNTIME_DLLS
@@ -141,13 +138,10 @@ else()
     message(STATUS "Build: CI Non-Windows build. Skipping REAL application.")
     file(WRITE ${CMAKE_BINARY_DIR}/.ci_placeholder "placeholder file for CI")
     install(FILES ${CMAKE_BINARY_DIR}/.ci_placeholder DESTINATION ${DESTINATION_DIR})
-    install(FILES tastatura.txt DESTINATION ${DESTINATION_DIR})
 
-    # Aplicăm flag-uri doar țintei 'game_core'
+    ### MODIFICAT ###
+    # Am re-adăugat 'arial.ttf' și aici
+    install(FILES tastatura.txt arial.ttf DESTINATION ${DESTINATION_DIR})
+
     set_compiler_flags(TARGET_NAMES game_core)
 endif() # Sfârșitul blocului if(BUILD_REAL_APP) / else()
-
-###############################################################################
-# Blocurile 'set_compiler_flags' de la final au fost șterse
-# deoarece logica a fost mutată mai sus, în blocurile if/else.
-###############################################################################

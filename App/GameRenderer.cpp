@@ -16,7 +16,10 @@ sf::Color getSfmlColor(Culoare c) {
 }
 
 GameRenderer::GameRenderer(sf::RenderWindow& win, Nivel& n)
-    : window(win), nivel(n) {}
+    : window(win), nivel(n) {
+    // AICI probabil vei vrea să inițializezi mesajManager, dacă nu o faci
+    // deja în lista de inițializare a clasei (în .h)
+}
 
 void GameRenderer::handleInput() {
     // Nu permite input dacă jocul s-a terminat (decât pentru a închide)
@@ -50,22 +53,21 @@ void GameRenderer::handleInput() {
     }
 }
 
-// --- METODĂ NOUĂ ---
+// --- METODĂ REACTIVATĂ ---
 void GameRenderer::actualizeazaStareUI() {
     if (nivel.getStareJoc() == StareJoc::GAME_OVER) {
         // Preluăm poziția din constantele definite în utils.h
         mesajManager.afiseaza("GAME OVER", {SCREEN_WIDTH / 2.f, SCREEN_HEIGHT / 2.f});
     } else {
-        mesajManager.ascunde(); // Deși momentan nu o ascundem niciodată
+        mesajManager.ascunde();
     }
 }
 
-// --- ÎNLOCUIEȘTE FUNCȚIA 'draw' ---
+// --- FUNCȚIE REACTIVATĂ ---
 void GameRenderer::draw() {
     window.clear(sf::Color(20, 20, 40));
 
     // ... (codul de desenare pentru bile, proiector, proiectile rămâne neschimbat) ...
-
     for (const auto& bilaCore : nivel.getSirDeBile()) {
         sf::CircleShape formaBila(bilaCore.getRaza());
         formaBila.setFillColor(getSfmlColor(bilaCore.getCuloare()));
@@ -76,7 +78,6 @@ void GameRenderer::draw() {
 
     const Proiector& proiectorCore = nivel.getProiector();
     const Bila& bilaProiector = proiectorCore.getBilaCurenta();
-
     sf::CircleShape formaProiector(bilaProiector.getRaza());
     formaProiector.setFillColor(getSfmlColor(bilaProiector.getCuloare()));
     formaProiector.setOrigin({bilaProiector.getRaza(), bilaProiector.getRaza()});
@@ -98,7 +99,7 @@ void GameRenderer::draw() {
         window.draw(formaProiectil);
     }
 
-    // --- ADAUGĂ DESENAREA MESAJULUI LA SFÂRȘIT ---
+    // --- DESENARE MESAJ REACTIVATĂ ---
     mesajManager.draw(window);
 
     window.display();
