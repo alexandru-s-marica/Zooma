@@ -35,15 +35,9 @@ target_include_directories(game_core PUBLIC
 
 ###############################################################################
 
-# Logica de "hack" pentru CI
-# Construim aplicația reală doar local sau pe Windows CI
-set(BUILD_REAL_APP OFF)
-if(NOT DEFINED ENV{CI})
-    set(BUILD_REAL_APP ON)
-elseif(WIN32)
-    set(BUILD_REAL_APP ON)
-endif()
-
+### MODIFICARE ###
+# Construim aplicația reală pe toate platformele pentru a rula testele
+set(BUILD_REAL_APP ON)
 ###############################################################################
 
 if(BUILD_REAL_APP)
@@ -99,7 +93,6 @@ if(BUILD_REAL_APP)
         endif()
     endif()
 
-    ### MODIFICARE ###
     # Blocurile de mai jos (install, copy_files, if MINGW) au fost mutate aici,
     # în interiorul lui if(BUILD_REAL_APP), deoarece toate depind de ținta
     # ${MAIN_EXECUTABLE_NAME} care se creează doar în acest bloc.
@@ -134,7 +127,6 @@ endif() # Acesta este sfârșitul blocului if(BUILD_REAL_APP)
 
 ###############################################################################
 
-### MODIFICARE ###
 # Aplicăm flag-urile de compilare condiționat.
 # `game_core` există mereu, dar `${MAIN_EXECUTABLE_NAME}` (oop) există doar dacă BUILD_REAL_APP este ON.
 if(BUILD_REAL_APP)
@@ -146,7 +138,3 @@ else()
 endif()
 
 ###############################################################################
-
-# ### MODIFICARE ###
-# Secțiunile install, copy_files și if(MINGW) care erau aici au fost mutate
-# mai sus, în interiorul blocului `if(BUILD_REAL_APP)`.
