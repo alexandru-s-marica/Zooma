@@ -35,8 +35,7 @@ target_include_directories(game_core PUBLIC
 
 ###############################################################################
 
-# Logica de "hack" pentru CI (reintrodusă)
-# Construim aplicația reală doar local sau pe Windows CI
+# Logica de "hack" pentru CI
 set(BUILD_REAL_APP OFF)
 if(NOT DEFINED ENV{CI})
     set(BUILD_REAL_APP ON)
@@ -45,6 +44,15 @@ elseif(WIN32)
 endif()
 
 ###############################################################################
+
+### MODIFICARE CHEIE ###
+# Setăm flag-urile de compilare GLOBALE (inclusiv ASan) AICI.
+# Facem asta înainte de `FetchContent`, astfel încât SFML să moștenească
+# aceste setări (în special /fsanitize=address pe MSVC).
+# Am corectat și typo-ul: "RUN_SANITERS" -> "RUN_SANITIZERS"
+set_compiler_flags(RUN_SANITIZERS TRUE)
+###############################################################################
+
 
 if(BUILD_REAL_APP)
     # --- CONSTRUCȚIA REALĂ (Local sau Windows CI) ---
@@ -64,6 +72,7 @@ if(BUILD_REAL_APP)
             GIT_SHALLOW    1
     )
 
+    # Acum, când SFML este configurat, va prelua flag-urile ASan
     FetchContent_MakeAvailable(SFML)
     find_package(Threads REQUIRED)
 
@@ -99,7 +108,8 @@ if(BUILD_REAL_APP)
         endif()
     endif()
 
-    # --- Comenzi mutate în interiorul if(BUILD_REAL_APP) ---
+    # Aplicăm flag-uri specifice țintelor noastre (dacă e nevoie)
+    set_compiler_flags(TARGET_NAMES ${MAIN_EXECUTABLE_NAME} game_core)
 
     # copy binaries to "bin" folder
     install(TARGETS ${MAIN_EXECUTABLE_NAME} DESTINATION ${DESTINATION_DIR})
@@ -128,29 +138,16 @@ if(BUILD_REAL_APP)
 
 else()
     # --- "Hack" pentru CI-ul de pe Non-Windows ---
-    # Acest bloc `else` previne eșecul din .yml (eroarea `mv`)
-
     message(STATUS "Build: CI Non-Windows build. Skipping REAL application.")
-    # Creăm un fișier gol pe care să-l punem în `bin/`
     file(WRITE ${CMAKE_BINARY_DIR}/.ci_placeholder "placeholder file for CI")
-    # Comanda install copiază fișierul gol în `bin/`
     install(FILES ${CMAKE_BINARY_DIR}/.ci_placeholder DESTINATION ${DESTINATION_DIR})
-
-    # De asemenea, copiem `tastatura.txt` și aici
-    # (Dacă `copy_files` eșuează fără o țintă, folosim `install`)
     install(FILES tastatura.txt DESTINATION ${DESTINATION_DIR})
 
+    # Aplicăm flag-uri doar țintei 'game_core'
+    set_compiler_flags(TARGET_NAMES game_core)
 endif() # Sfârșitul blocului if(BUILD_REAL_APP) / else()
 
 ###############################################################################
-
-# Aplicăm flag-urile de compilare condiționat
-if(BUILD_REAL_APP)
-    # Aplicăm la ambele ținte (doar dacă 'oop' a fost creat)
-    set_compiler_flags(RUN_SANITERS TRUE TARGET_NAMES ${MAIN_EXECUTABLE_NAME} game_core)
-else()
-    # Aplicăm doar la ținta care există mereu
-    set_compiler_flags(RUN_SANITERS TRUE TARGET_NAMES game_core)
-endif()
-
+# Blocurile 'set_compiler_flags' de la final au fost șterse
+# deoarece logica a fost mutată mai sus, în blocurile if/else.
 ###############################################################################
