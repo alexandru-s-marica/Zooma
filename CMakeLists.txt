@@ -99,39 +99,54 @@ if(BUILD_REAL_APP)
         endif()
     endif()
 
-endif()
+    ### MODIFICARE ###
+    # Blocurile de mai jos (install, copy_files, if MINGW) au fost mutate aici,
+    # în interiorul lui if(BUILD_REAL_APP), deoarece toate depind de ținta
+    # ${MAIN_EXECUTABLE_NAME} care se creează doar în acest bloc.
 
-###############################################################################
+    # copy binaries to "bin" folder; these are uploaded as artifacts on each release
+    # DESTINATION_DIR is set as "bin" in cmake/Options.cmake:6
+    install(TARGETS ${MAIN_EXECUTABLE_NAME} DESTINATION ${DESTINATION_DIR})
+    if(APPLE)
+        install(FILES launcher.command DESTINATION ${DESTINATION_DIR})
+    endif()
 
-# Aplicăm flag-urile de compilare la ambele ținte
-set_compiler_flags(RUN_SANITIZERS TRUE TARGET_NAMES ${MAIN_EXECUTABLE_NAME} game_core)
+    copy_files(FILES tastatura.txt COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
 
-###############################################################################
-
-# copy binaries to "bin" folder; these are uploaded as artifacts on each release
-# DESTINATION_DIR is set as "bin" in cmake/Options.cmake:6
-install(TARGETS ${MAIN_EXECUTABLE_NAME} DESTINATION ${DESTINATION_DIR})
-if(APPLE)
-    install(FILES launcher.command DESTINATION ${DESTINATION_DIR})
-endif()
-
-copy_files(FILES tastatura.txt COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
-
-###############################################################################
-
-# Adăugăm pasul de copiere a DLL-urilor pentru MinGW (Local sau CI)
-if(MINGW)
-    get_filename_component(MINGW_COMPILER_BIN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
-    set(RUNTIME_DLLS
-            "libstdc++-6.dll"
-            "libgcc_s_seh-1.dll"
-            "libwinpthread-1.dll"
-    )
-    foreach(DLL_FILE ${RUNTIME_DLLS})
-        add_custom_command(TARGET ${MAIN_EXECUTABLE_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${MINGW_COMPILER_BIN_DIR}/${DLL_FILE}"
-                "$<TARGET_FILE_DIR:${MAIN_EXECUTABLE_NAME}>"
+    # Adăugăm pasul de copiere a DLL-urilor pentru MinGW (Local sau CI)
+    if(MINGW)
+        get_filename_component(MINGW_COMPILER_BIN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
+        set(RUNTIME_DLLS
+                "libstdc++-6.dll"
+                "libgcc_s_seh-1.dll"
+                "libwinpthread-1.dll"
         )
-    endforeach()
+        foreach(DLL_FILE ${RUNTIME_DLLS})
+            add_custom_command(TARGET ${MAIN_EXECUTABLE_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${MINGW_COMPILER_BIN_DIR}/${DLL_FILE}"
+                    "$<TARGET_FILE_DIR:${MAIN_EXECUTABLE_NAME}>"
+            )
+        endforeach()
+    endif()
+
+endif() # Acesta este sfârșitul blocului if(BUILD_REAL_APP)
+
+###############################################################################
+
+### MODIFICARE ###
+# Aplicăm flag-urile de compilare condiționat.
+# `game_core` există mereu, dar `${MAIN_EXECUTABLE_NAME}` (oop) există doar dacă BUILD_REAL_APP este ON.
+if(BUILD_REAL_APP)
+    # Aplicăm la ambele ținte
+    set_compiler_flags(RUN_SANITIZERS TRUE TARGET_NAMES ${MAIN_EXECUTABLE_NAME} game_core)
+else()
+    # Aplicăm doar la ținta care știm sigur că există
+    set_compiler_flags(RUN_SANITIZERS TRUE TARGET_NAMES game_core)
 endif()
+
+###############################################################################
+
+# ### MODIFICARE ###
+# Secțiunile install, copy_files și if(MINGW) care erau aici au fost mutate
+# mai sus, în interiorul blocului `if(BUILD_REAL_APP)`.
