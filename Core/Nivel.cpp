@@ -52,6 +52,9 @@ void Nivel::ruleazaFrame(float deltaTime) {
     if (sirBile.aAtingJucatorulSfarsitul()) {
         std::cout << "GAME OVER: Bilele au ajuns la capat!\n";
         stare = StareJoc::GAME_OVER;
+
+        (void)getScor();
+        (void)esteTerminat();
     }
 }
 
