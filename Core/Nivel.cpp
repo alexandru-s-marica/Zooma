@@ -1,5 +1,7 @@
 #include "Nivel.h"
 #include <cmath>
+#include <iostream>
+#include <algorithm>
 
 void Nivel::genereazaTraseu() {
     traseu.clear();
@@ -36,16 +38,14 @@ void Nivel::ruleazaFrame(float deltaTime) {
 
     sirBile.actualizeaza(deltaTime);
 
-    for (auto it = proiectileInZbor.begin(); it != proiectileInZbor.end(); ) {
-        it->first.setPozitie(it->first.getPozitie() + it->second * 1000.f * deltaTime);
-
-        Vec2f pos = it->first.getPozitie();
-        if (pos.x < 0 || pos.x > SCREEN_WIDTH || pos.y < 0 || pos.y > SCREEN_HEIGHT) {
-            it = proiectileInZbor.erase(it);
-        } else {
-            ++it;
-        }
+    for (auto& proiectil : proiectileInZbor) {
+        proiectil.first.setPozitie(proiectil.first.getPozitie() + proiectil.second * 1000.f * deltaTime);
     }
+
+    proiectileInZbor.remove_if([](const std::pair<Bila, Vec2f>& p) {
+        const Vec2f& pos = p.first.getPozitie();
+        return pos.x < 0 || pos.x > SCREEN_WIDTH || pos.y < 0 || pos.y > SCREEN_HEIGHT;
+    });
 
     gestioneazaColiziuni();
 
@@ -60,21 +60,23 @@ void Nivel::gestioneazaColiziuni() {
 
     auto it_proiectil = proiectileInZbor.begin();
     while (it_proiectil != proiectileInZbor.end()) {
-        bool coliziune = false;
+        bool coliziuneDetectata = false;
 
         for (auto it_bila_sir = bileSir.begin(); it_bila_sir != bileSir.end(); ++it_bila_sir) {
 
             if (it_proiectil->first.getBounds().findIntersection(it_bila_sir->getBounds())) {
+
                 int scorAdaugat = sirBile.insereazaSiVerifica(it_bila_sir, it_proiectil->first);
                 scor += scorAdaugat;
 
                 it_proiectil = proiectileInZbor.erase(it_proiectil);
-                coliziune = true;
+                coliziuneDetectata = true;
+
                 break;
             }
         }
 
-        if (!coliziune) {
+        if (!coliziuneDetectata) {
             ++it_proiectil;
         }
     }
