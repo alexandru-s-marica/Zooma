@@ -58,6 +58,14 @@ endif()
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
 add_executable(${MAIN_EXECUTABLE_NAME}
     main.cpp
+        Core/Bila.cpp
+        Core/Bila.h
+        Core/Nivel.h
+        Core/Nivel.cpp
+        Core/Proiector.cpp
+        Core/SirDeBile.cpp
+        App/GameRenderer.cpp
+        App/MesajUI.cpp
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
