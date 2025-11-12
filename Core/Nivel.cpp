@@ -52,11 +52,14 @@ void Nivel::ruleazaFrame(float deltaTime) {
     if (sirBile.aAtingJucatorulSfarsitul()) {
         std::cout << "GAME OVER: Bilele au ajuns la capat!\n";
         stare = StareJoc::GAME_OVER;
+
+        (void)getScor();
+        (void)esteTerminat();
     }
 }
 
 void Nivel::gestioneazaColiziuni() {
-    auto& bileSir = sirBile.getBile();
+    std::list<Bila>& bileSir = sirBile.getBile();
 
     auto it_proiectil = proiectileInZbor.begin();
     while (it_proiectil != proiectileInZbor.end()) {
