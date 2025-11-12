@@ -52,20 +52,15 @@ void Nivel::ruleazaFrame(float deltaTime) {
     if (sirBile.aAtingJucatorulSfarsitul()) {
         std::cout << "GAME OVER: Bilele au ajuns la capat!\n";
         stare = StareJoc::GAME_OVER;
-
-        (void)getScor();
-        (void)esteTerminat();
     }
 }
 
 void Nivel::gestioneazaColiziuni() {
-    std::list<Bila>& bileSir = sirBile.getBile();
-
     auto it_proiectil = proiectileInZbor.begin();
     while (it_proiectil != proiectileInZbor.end()) {
         bool coliziuneDetectata = false;
 
-        for (auto it_bila_sir = bileSir.begin(); it_bila_sir != bileSir.end(); ++it_bila_sir) {
+        for (auto it_bila_sir = sirBile.getBile().begin(); it_bila_sir != sirBile.getBile().end(); ++it_bila_sir) {
 
             if (it_proiectil->first.getBounds().findIntersection(it_bila_sir->getBounds())) {
 
