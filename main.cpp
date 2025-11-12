@@ -6,6 +6,14 @@
 #include "Core/Nivel.h"
 
 int main() {
+
+    //am facut afisarea sa functioneze si testez aici
+    //inainte de inceperea propriu-zisa a programului
+    //(laboratorul 7)
+    SirDeBile sirDeBile;
+    std::cout<<sirDeBile;
+    //functioneaza si afiseaza datele initiale (toate 0)
+
     sf::RenderWindow window(sf::VideoMode({SCREEN_WIDTH, SCREEN_HEIGHT}), "Zooma");
     window.setFramerateLimit(60);
 

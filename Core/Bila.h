@@ -1,5 +1,5 @@
 #pragma once
-#include "utils.h" // Acum include structurile noastre Vec2f și Culoare
+#include "utils.h"
 
 class Bila {
 private:

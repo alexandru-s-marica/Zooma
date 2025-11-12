@@ -10,7 +10,7 @@ private:
     float viteza;
     float progresCapSnake;
     float distantaIntreBile;
-    float lungimeTotalaTraseu; // <-- MEMBRU NOU
+    float lungimeTotalaTraseu;
 
     Vec2f getPozitiePeTraseu(float progres) const;
 
@@ -28,11 +28,9 @@ public:
 
     int insereazaSiVerifica(std::list<Bila>::iterator it_target, const Bila& bilaNoua);
 
-    bool aAtingJucatorulSfarsitul() const; // <-- METODĂ NOUĂ
+    bool aAtingJucatorulSfarsitul() const;
 
-    std::ostream& operator<<(std::ostream& os) const;
+    friend std::ostream& operator<<(std::ostream&, const SirDeBile&);
 };
 
-inline std::ostream& operator<<(std::ostream& os, const SirDeBile& s) {
-    return s.operator<<(os);
-}
+std::ostream& operator<<(std::ostream&, const SirDeBile&);

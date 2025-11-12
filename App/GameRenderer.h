@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <SFML/Window/Event.hpp> // Pentru evenimente SFML 3
-#include "../Core/Nivel.h" // Include clasa Nivel pură
+#include <SFML/Window/Event.hpp>
+#include "../Core/Nivel.h"
 #include "MesajUI.h"
 
 // Helpers pentru conversia culorilor noastre în culori SFML

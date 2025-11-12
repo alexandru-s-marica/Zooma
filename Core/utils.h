@@ -12,7 +12,6 @@ struct Vec2f {
     Vec2f operator*(float scalar) const { return {x * scalar, y * scalar}; }
     float magnitude() const { return std::sqrt(x*x + y*y); }
 
-    // cppcheck-suppress unusedFunction
     Vec2f normalize() const { float mag = magnitude(); return {x / mag, y / mag}; }
 };
 
@@ -21,7 +20,6 @@ inline std::ostream& operator<<(std::ostream& os, const Vec2f& v) {
     return os;
 }
 
-// Structură generică pentru limite (bounding box)
 struct Bounds {
     Vec2f position;
     float radius;
@@ -34,7 +32,6 @@ struct Bounds {
     }
 };
 
-// Enum pentru culori, fără legătură cu SFML
 enum class Culoare {
     ROSU,
     VERDE,
@@ -42,7 +39,7 @@ enum class Culoare {
     GALBEN,
     VIOLET,
     PORTOCALIU,
-    UNKNOWN // Pentru erori sau valori implicite
+    UNKNOWN //pentru erori sau valori implicite
 };
 
 inline std::ostream& operator<<(std::ostream& os, Culoare c) {

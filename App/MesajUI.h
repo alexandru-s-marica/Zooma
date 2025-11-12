@@ -9,7 +9,7 @@ private:
     bool esteVizibil;
 
 public:
-    MesajUI(); // Constructorul va încărca fontul
+    MesajUI();
     void afiseaza(const std::string& mesaj, sf::Vector2f pozitie);
     void ascunde();
     void draw(sf::RenderWindow& window) const;

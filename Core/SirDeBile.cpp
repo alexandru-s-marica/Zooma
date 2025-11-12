@@ -31,6 +31,8 @@ SirDeBile::SirDeBile(std::vector<Vec2f> traseu, float viteza, float distanta)
     }
 }
 
+
+//trebuie modificat si testat
 SirDeBile::SirDeBile(const SirDeBile& other)
     : bile(other.bile), traseu(other.traseu), viteza(other.viteza),
       progresCapSnake(other.progresCapSnake), distantaIntreBile(other.distantaIntreBile),
@@ -138,9 +140,9 @@ bool SirDeBile::aAtingJucatorulSfarsitul() const {
     return (progresCapSnake >= lungimeTotalaTraseu) && (lungimeTotalaTraseu > 0);
 }
 
-std::ostream& SirDeBile::operator<<(std::ostream& os) const {
-    os << "SirDeBile (Viteza: " << viteza << ", Progres Cap: " << progresCapSnake << ", Bile: " << bile.size() << ")\n";
-    for (const auto& b : bile) {
+std::ostream& operator<<(std::ostream& os, const SirDeBile& sirBile){
+    os << "SirDeBile (Viteza: " << sirBile.viteza << ", Progres Cap: " << sirBile.progresCapSnake << ", Bile: " << sirBile.bile.size() << ")\n";
+    for (const auto& b : sirBile.bile) {
         os << "  - " << b << "\n";
     }
     return os;

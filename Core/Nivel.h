@@ -3,7 +3,6 @@
 #include "Proiector.h"
 #include <vector>
 
-// --- ENUM NOU ---
 enum class StareJoc {
     RULEAZA,
     GAME_OVER
@@ -18,7 +17,7 @@ private:
     std::list<std::pair<Bila, Vec2f>> proiectileInZbor;
 
     int scor;
-    StareJoc stare; // <-- MEMBRU NOU
+    StareJoc stare;
 
     void genereazaTraseu();
 
@@ -36,8 +35,8 @@ public:
     const std::list<std::pair<Bila, Vec2f>>& getProiectileInZbor() const;
     int getScor() const;
 
-    StareJoc getStareJoc() const; // <-- METODĂ NOUĂ
-    bool esteTerminat() const; // O vom păstra, deși 'getStareJoc' e mai utilă
+    StareJoc getStareJoc() const;
+    bool esteTerminat() const;
 
     std::ostream& operator<<(std::ostream& os) const;
 };

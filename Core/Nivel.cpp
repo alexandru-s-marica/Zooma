@@ -19,7 +19,6 @@ Nivel::Nivel()
     genereazaTraseu();
 }
 
-// CORECȚIE: Am scos 'explicit' de la începutul liniei
 Nivel::Nivel(float initialBallSpacing)
     : proiector({SCREEN_WIDTH / 2.f, SCREEN_HEIGHT - 100.f}),
       scor(0),
@@ -30,7 +29,6 @@ Nivel::Nivel(float initialBallSpacing)
     sirBile = SirDeBile(traseu, 40.f, initialBallSpacing);
 }
 
-// cppcheck-suppress unusedFunction
 void Nivel::ruleazaFrame(float deltaTime) {
     if (stare == StareJoc::GAME_OVER) {
         return;
@@ -58,7 +56,6 @@ void Nivel::ruleazaFrame(float deltaTime) {
 }
 
 void Nivel::gestioneazaColiziuni() {
-    // cppcheck-suppress constVariableReference
     auto& bileSir = sirBile.getBile();
 
     auto it_proiectil = proiectileInZbor.begin();
@@ -83,17 +80,14 @@ void Nivel::gestioneazaColiziuni() {
     }
 }
 
-// cppcheck-suppress unusedFunction
 void Nivel::adaugaProiectil(const Bila& p, const Vec2f& dir) {
     proiectileInZbor.push_back({p, dir});
 }
 
-// cppcheck-suppress unusedFunction
 const std::list<Bila>& Nivel::getSirDeBile() const {
     return sirBile.getBile();
 }
 
-// cppcheck-suppress unusedFunction
 Proiector& Nivel::getProiector() {
     return proiector;
 }
@@ -102,22 +96,18 @@ const Proiector& Nivel::getProiector() const {
     return proiector;
 }
 
-// cppcheck-suppress unusedFunction
 const std::list<std::pair<Bila, Vec2f>>& Nivel::getProiectileInZbor() const {
     return proiectileInZbor;
 }
 
-// cppcheck-suppress unusedFunction
 int Nivel::getScor() const {
     return scor;
 }
 
-// cppcheck-suppress unusedFunction
 StareJoc Nivel::getStareJoc() const {
     return stare;
 }
 
-// cppcheck-suppress unusedFunction
 bool Nivel::esteTerminat() const {
     return stare == StareJoc::GAME_OVER;
 }

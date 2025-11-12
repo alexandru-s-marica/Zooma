@@ -1,7 +1,6 @@
 #include "Proiector.h"
 #include <ctime>
 
-// CORECȚIE: Am scos 'explicit' de la începutul liniei
 Proiector::Proiector(Vec2f pos)
     : pozitie(pos),
       bilaCurenta(Culoare::UNKNOWN, pos, 20.f),
