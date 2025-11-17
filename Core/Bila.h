@@ -1,5 +1,6 @@
 #pragma once
 #include "utils.h"
+#include <iostream>
 
 class Bila {
 private:
@@ -8,6 +9,9 @@ private:
     float raza;
 
 public:
+    //Bila()=default;
+    //am folosit doar pentru testul de afisare
+
     Bila(Culoare c, Vec2f pos, float r);
 
     void setPozitie(Vec2f pos);
@@ -17,9 +21,5 @@ public:
 
     Bounds getBounds() const;
 
-    std::ostream& operator<<(std::ostream& os) const;
+    friend std::ostream& operator<<(std::ostream& os, const Bila& b);
 };
-
-inline std::ostream& operator<<(std::ostream& os, const Bila& b) {
-    return b.operator<<(os);
-}

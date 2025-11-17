@@ -54,7 +54,7 @@ const Bila& Proiector::getBilaUrmatoare() const {
     return bilaUrmatoare;
 }
 
-std::ostream& Proiector::operator<<(std::ostream& os) const {
-    os << "Proiector (Pozitie: " << pozitie << ", Bila Curenta: " << bilaCurenta.getCuloare() << ", Bila Urmatoare: " << bilaUrmatoare.getCuloare() << ")";
+std::ostream& operator<<(std::ostream& os, const Proiector& p){
+    os << "Proiector (Pozitie: " << p.pozitie << ", Bila Curenta: " << p.bilaCurenta.getCuloare() << ", Bila Urmatoare: " << p.bilaUrmatoare.getCuloare() << ")";
     return os;
 }

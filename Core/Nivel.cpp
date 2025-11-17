@@ -115,11 +115,8 @@ bool Nivel::esteTerminat() const {
     return stare == StareJoc::GAME_OVER;
 }
 
-std::ostream& Nivel::operator<<(std::ostream& os) const {
-    os << "--- Stare Nivel ---\n";
-    os << "Scor: " << scor << "\n";
-    os << proiector << "\n";
-    os << sirBile << "\n";
-    os << "-------------------\n";
+std::ostream& operator<<(std::ostream& os, const Nivel& n) {
+    os << "Nivel (Scor: " << n.scor << ", Stare: " << (int)n.stare << ")\n";
+    os << "  - Proiector: " << n.proiector << "\n";
     return os;
 }

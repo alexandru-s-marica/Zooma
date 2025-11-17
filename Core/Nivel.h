@@ -38,9 +38,5 @@ public:
     StareJoc getStareJoc() const;
     bool esteTerminat() const;
 
-    std::ostream& operator<<(std::ostream& os) const;
+    friend std::ostream& operator<<(std::ostream& os, const Nivel& n);
 };
-
-inline std::ostream& operator<<(std::ostream& os, const Nivel& n) {
-    return n.operator<<(os);
-}

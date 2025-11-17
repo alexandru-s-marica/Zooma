@@ -21,11 +21,7 @@ public:
     Vec2f getPozitie() const;
 
     const Bila& getBilaCurenta() const;
-    const Bila& getBilaUrmatoare() const; // <-- ADAUGĂ ASTA
+    const Bila& getBilaUrmatoare() const;
 
-    std::ostream& operator<<(std::ostream& os) const;
+    friend std::ostream& operator<<(std::ostream& os, const Proiector& p);
 };
-
-inline std::ostream& operator<<(std::ostream& os, const Proiector& p) {
-    return p.operator<<(os);
-}

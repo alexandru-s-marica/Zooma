@@ -23,7 +23,9 @@ Bounds Bila::getBounds() const {
     return {pozitie, raza};
 }
 
-std::ostream& Bila::operator<<(std::ostream& os) const {
-    os << "Bila (Culoare: " << culoare << ", Pozitie: " << pozitie << ", Raza: " << raza << ")";
+std::ostream& operator<<(std::ostream& os, const Bila& b) {
+    os << "Bila (Culoare: " << b.culoare
+       << ", Pozitie: " << b.pozitie
+       << ", Raza: " << b.raza << ")";
     return os;
 }

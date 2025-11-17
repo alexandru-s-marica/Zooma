@@ -55,6 +55,6 @@ inline std::ostream& operator<<(std::ostream& os, Culoare c) {
     return os;
 }
 
-// Constante pentru fereastră
+// Constante pentru fereastra
 const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 800;
