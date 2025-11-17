@@ -7,6 +7,12 @@ struct Vec2f {
     float x;
     float y;
 
+    Vec2f(float x, float y)
+    {
+        this->x = x;
+        this->y = y;
+    }
+
     Vec2f operator+(const Vec2f& other) const { return {x + other.x, y + other.y}; }
     Vec2f operator-(const Vec2f& other) const { return {x - other.x, y - other.y}; }
     Vec2f operator*(float scalar) const { return {x * scalar, y * scalar}; }
