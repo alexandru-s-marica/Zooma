@@ -3,11 +3,7 @@
 
 MesajUI::MesajUI() : text(font), esteVizibil(false) {
     if (!font.openFromFile("arial.ttf")) {
-        if (!font.openFromFile("C:/Windows/Fonts/arial.ttf")) {
-            if (!font.openFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")) {
-                std::cerr << "Eroare: Nu s-a putut încărca fontul! 'arial.ttf' lipsește.\n";
-            }
-        }
+        std::cerr << "[Eroare UI] Nu s-a putut încărca 'arial.ttf'!\n";
     }
 
     text.setFont(font);

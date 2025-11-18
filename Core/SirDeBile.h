@@ -33,4 +33,4 @@ public:
     friend std::ostream& operator<<(std::ostream&, const SirDeBile&);
 };
 
-std::ostream& operator<<(std::ostream&, const SirDeBile&);
+//std::ostream& operator<<(std::ostream&, const SirDeBile&);
