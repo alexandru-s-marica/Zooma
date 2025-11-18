@@ -17,7 +17,7 @@ SirDeBile::SirDeBile(std::vector<Vec2f> traseu, float viteza, float distanta)
     }
     std::cout << "Lungimea totala a traseului: " << lungimeTotalaTraseu << "\n";
 
-    const int NUMAR_BILE_INITIALE = 8;
+    const int NUMAR_BILE_INITIALE = 10;
     progresCapSnake = (NUMAR_BILE_INITIALE - 1) * distantaIntreBile;
 
     float progresCurent = progresCapSnake;
@@ -31,8 +31,6 @@ SirDeBile::SirDeBile(std::vector<Vec2f> traseu, float viteza, float distanta)
     }
 }
 
-
-//trebuie modificat si testat
 SirDeBile::SirDeBile(const SirDeBile& other)
     : bile(other.bile), traseu(other.traseu), viteza(other.viteza),
       progresCapSnake(other.progresCapSnake), distantaIntreBile(other.distantaIntreBile),
@@ -136,7 +134,6 @@ int SirDeBile::insereazaSiVerifica(std::list<Bila>::iterator it_target, const Bi
 }
 
 bool SirDeBile::aAtingJucatorulSfarsitul() const {
-    // float progresCoada = progresCapSnake - (bile.size() - 1) * distantaIntreBile; // Avertisment 'unused'
     return (progresCapSnake >= lungimeTotalaTraseu) && (lungimeTotalaTraseu > 0);
 }
 
