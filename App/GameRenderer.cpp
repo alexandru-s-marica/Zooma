@@ -26,15 +26,22 @@ void GameRenderer::handleInput() {
         if (event->is<sf::Event::Closed>()) {
             window.close();
         }
-
-        //ignora input ul daca jocul s a terminat
-        if (nivel.getStareJoc() == StareJoc::GAME_OVER) {
-            continue;
+        //pentru RESTART (Tasta R)
+        if (auto keyPress = event->getIf<sf::Event::KeyPressed>()) {
+            if (keyPress->code == sf::Keyboard::Key::R) {
+                // Daca jocul e terminat sau castigat, dam reset
+                if (nivel.esteTerminat() || nivel.esteCastigat()) {
+                    nivel.reset(40.f);
+                    mesajManager.ascunde();
+                }
+            }
         }
+
+        if (nivel.getStareJoc() != StareJoc::RULEAZA)
 
         if (auto mouseMove = event->getIf<sf::Event::MouseMoved>()) {
             nivel.getProiector().rotesteSpre({static_cast<float>(mouseMove->position.x), static_cast<float>(mouseMove->position.y)});
-        } else if (auto mousePress = event->getIf<sf::Event::MouseButtonPressed>()) {
+        } if (auto mousePress = event->getIf<sf::Event::MouseButtonPressed>()) {
             if (mousePress->button == sf::Mouse::Button::Left) {
                 Bila proiectil = nivel.getProiector().trage();
 
@@ -54,8 +61,11 @@ void GameRenderer::handleInput() {
 
 void GameRenderer::actualizeazaStareUI() {
     if (nivel.getStareJoc() == StareJoc::GAME_OVER) {
-        //pozitia preluata din utils.h
-        mesajManager.afiseaza("GAME OVER", {SCREEN_WIDTH / 2.f, SCREEN_HEIGHT / 2.f});
+        mesajManager.afiseaza("GAME OVER\nApasa R pentru Replay", {SCREEN_WIDTH / 2.f, SCREEN_HEIGHT / 2.f});
+    }
+    else if (nivel.getStareJoc() == StareJoc::CASTIGAT) {
+        std::string mesaj = "VICTORIE!\nScor: " + std::to_string(nivel.getScor()) + "\nApasa R";
+        mesajManager.afiseaza(mesaj, {SCREEN_WIDTH / 2.f, SCREEN_HEIGHT / 2.f});
     }
     else {
         mesajManager.ascunde();

@@ -56,6 +56,10 @@ void Nivel::ruleazaFrame(float deltaTime) {
         (void)getScor();
         (void)esteTerminat();
     }
+    else if (sirBile.getBile().empty() && stare == StareJoc::RULEAZA) {
+        std::cout << "VICTORIE: Toate bilele au fost distruse!\n";
+        stare = StareJoc::CASTIGAT;
+    }
 }
 
 void Nivel::gestioneazaColiziuni() {
@@ -119,4 +123,18 @@ std::ostream& operator<<(std::ostream& os, const Nivel& n) {
     os << "Nivel (Scor: " << n.scor << ", Stare: " << (int)n.stare << ")\n";
     os << "  - Proiector: " << n.proiector << "\n";
     return os;
+}
+
+void Nivel::reset(float initialBallSpacing) {
+    scor = 0;
+    stare = StareJoc::RULEAZA;
+    proiectileInZbor.clear();
+    proiector = Proiector({SCREEN_WIDTH / 2.f, SCREEN_HEIGHT - 100.f});
+    traseu.clear();
+    genereazaTraseu();
+    sirBile = SirDeBile(traseu, 40.f, initialBallSpacing);
+}
+
+bool Nivel::esteCastigat() const {
+    return stare == StareJoc::CASTIGAT;
 }

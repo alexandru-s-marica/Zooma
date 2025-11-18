@@ -17,7 +17,7 @@ SirDeBile::SirDeBile(std::vector<Vec2f> traseu, float viteza, float distanta)
     }
     std::cout << "Lungimea totala a traseului: " << lungimeTotalaTraseu << "\n";
 
-    const int NUMAR_BILE_INITIALE = 15;
+    const int NUMAR_BILE_INITIALE = 8;
     progresCapSnake = (NUMAR_BILE_INITIALE - 1) * distantaIntreBile;
 
     float progresCurent = progresCapSnake;

@@ -3,7 +3,7 @@
 
 MesajUI::MesajUI() : text(font), esteVizibil(false) {
     if (!font.openFromFile("arial.ttf")) {
-        std::cerr << "[Eroare UI] Nu s-a putut încărca 'arial.ttf'!\n";
+        std::cerr << "[Eroare UI] Nu s-a putut incarca 'arial.ttf'!\n";
     }
 
     text.setFont(font);
@@ -18,7 +18,6 @@ void MesajUI::afiseaza(const std::string& mesaj, sf::Vector2f pozitie) {
 
     sf::FloatRect bounds = text.getLocalBounds();
 
-    // CORECȚIE AICI: Folosim { ... } pentru a crea un sf::Vector2f
     text.setOrigin({bounds.position.x + bounds.size.x / 2.0f,
                    bounds.position.y + bounds.size.y / 2.0f});
 

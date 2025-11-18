@@ -5,7 +5,8 @@
 
 enum class StareJoc {
     RULEAZA,
-    GAME_OVER
+    GAME_OVER,
+    CASTIGAT
 };
 
 class Nivel {
@@ -36,6 +37,8 @@ public:
     int getScor() const;
 
     StareJoc getStareJoc() const;
+    void reset(float initialBallSpacing);
+    bool esteCastigat() const;
     bool esteTerminat() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Nivel& n);
