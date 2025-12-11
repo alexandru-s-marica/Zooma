@@ -138,3 +138,12 @@ void Nivel::reset(float initialBallSpacing) {
 bool Nivel::esteCastigat() const {
     return stare == StareJoc::CASTIGAT;
 }
+
+Bila Nivel::trageBilaJucator() {
+    std::vector<Culoare> culoriDisponibile = sirBile.getCuloriActive();
+
+    if (culoriDisponibile.empty()) {
+    }
+
+    return proiector.trage(culoriDisponibile);
+}

@@ -17,40 +17,44 @@ sf::Color getSfmlColor(Culoare c) {
 
 GameRenderer::GameRenderer(sf::RenderWindow& win, Nivel& n)
     : window(win), nivel(n) {
-
 }
 
 void GameRenderer::handleInput() {
-    // nu mai permite input dupa ce jocul s a terminat
     while (auto event = window.pollEvent()) {
         if (event->is<sf::Event::Closed>()) {
             window.close();
         }
-        //pentru RESTART (Tasta R)
+
         if (auto keyPress = event->getIf<sf::Event::KeyPressed>()) {
             if (keyPress->code == sf::Keyboard::Key::R) {
-                // Daca jocul e terminat sau castigat, dam reset
-                if (nivel.esteTerminat() || nivel.esteCastigat()) {
-                    nivel.reset(40.f);
-                    mesajManager.ascunde();
-                }
+                nivel.reset(40.f);
+                actualizeazaStareUI();
             }
         }
 
-        if (nivel.getStareJoc() != StareJoc::RULEAZA)
+        if (nivel.getStareJoc() != StareJoc::RULEAZA) {
+            continue;
+        }
 
         if (auto mouseMove = event->getIf<sf::Event::MouseMoved>()) {
-            nivel.getProiector().rotesteSpre({static_cast<float>(mouseMove->position.x), static_cast<float>(mouseMove->position.y)});
-        } if (auto mousePress = event->getIf<sf::Event::MouseButtonPressed>()) {
+            nivel.getProiector().rotesteSpre({
+                static_cast<float>(mouseMove->position.x),
+                static_cast<float>(mouseMove->position.y)
+            });
+        }
+        else if (auto mousePress = event->getIf<sf::Event::MouseButtonPressed>()) {
             if (mousePress->button == sf::Mouse::Button::Left) {
-                Bila proiectil = nivel.getProiector().trage();
+                Bila proiectil = nivel.trageBilaJucator();
 
-                Vec2f mousePos = {static_cast<float>(mousePress->position.x), static_cast<float>(mousePress->position.y)};
+                Vec2f mousePos = {
+                    static_cast<float>(mousePress->position.x),
+                    static_cast<float>(mousePress->position.y)
+                };
+
                 Vec2f dir = mousePos - nivel.getProiector().getPozitie();
                 dir = dir.normalize();
 
                 nivel.adaugaProiectil(proiectil, dir);
-
             }
             if (mousePress->button == sf::Mouse::Button::Right) {
                 nivel.getProiector().schimbaBila();
@@ -60,12 +64,13 @@ void GameRenderer::handleInput() {
 }
 
 void GameRenderer::actualizeazaStareUI() {
-    if (nivel.getStareJoc() == StareJoc::GAME_OVER) {
-        mesajManager.afiseaza("GAME OVER\nApasa R pentru Replay", {SCREEN_WIDTH / 2.f, SCREEN_HEIGHT / 2.f});
+    StareJoc stare = nivel.getStareJoc();
+
+    if (stare == StareJoc::GAME_OVER) {
+        mesajManager.afiseaza("GAME OVER\nApasa 'R' pentru Restart", {600.f, 400.f});
     }
-    else if (nivel.getStareJoc() == StareJoc::CASTIGAT) {
-        std::string mesaj = "VICTORIE!\nScor: " + std::to_string(nivel.getScor()) + "\nApasa R";
-        mesajManager.afiseaza(mesaj, {SCREEN_WIDTH / 2.f, SCREEN_HEIGHT / 2.f});
+    else if (stare == StareJoc::CASTIGAT) {
+        mesajManager.afiseaza("VICTORIE!\nApasa 'R' pentru Restart", {600.f, 400.f});
     }
     else {
         mesajManager.ascunde();
@@ -73,19 +78,28 @@ void GameRenderer::actualizeazaStareUI() {
 }
 
 void GameRenderer::draw() {
-    window.clear(sf::Color(20, 20, 40));
+    window.clear(sf::Color(20, 20, 40)); // Fundal
 
-    //codul de desenare pentru bile, proiector, proiectile,...
     for (const auto& bilaCore : nivel.getSirDeBile()) {
         sf::CircleShape formaBila(bilaCore.getRaza());
-        formaBila.setFillColor(getSfmlColor(bilaCore.getCuloare()));
+
+        sf::Color c = getSfmlColor(bilaCore.getCuloare());
+
+        if (bilaCore.esteInDistrugere()) {
+            c.a = 100; // Transparență
+            formaBila.setScale({0.8f, 0.8f}); // Micșorare (Vector2f pentru SFML 3)
+        }
+
+        formaBila.setFillColor(c);
         formaBila.setOrigin({bilaCore.getRaza(), bilaCore.getRaza()});
         formaBila.setPosition({bilaCore.getPozitie().x, bilaCore.getPozitie().y});
+
         window.draw(formaBila);
     }
 
     const Proiector& proiectorCore = nivel.getProiector();
     const Bila& bilaProiector = proiectorCore.getBilaCurenta();
+
     sf::CircleShape formaProiector(bilaProiector.getRaza());
     formaProiector.setFillColor(getSfmlColor(bilaProiector.getCuloare()));
     formaProiector.setOrigin({bilaProiector.getRaza(), bilaProiector.getRaza()});
@@ -93,17 +107,20 @@ void GameRenderer::draw() {
     window.draw(formaProiector);
 
     const Bila& bilaUrmatoare = proiectorCore.getBilaUrmatoare();
-    sf::CircleShape formaBilaUrmatoare(bilaUrmatoare.getRaza() * 0.7f);
+    float razaMica = bilaUrmatoare.getRaza() * 0.7f;
+
+    sf::CircleShape formaBilaUrmatoare(razaMica);
     formaBilaUrmatoare.setFillColor(getSfmlColor(bilaUrmatoare.getCuloare()));
-    formaBilaUrmatoare.setOrigin({bilaUrmatoare.getRaza() * 0.7f, bilaUrmatoare.getRaza() * 0.7f});
+    formaBilaUrmatoare.setOrigin({razaMica, razaMica});
     formaBilaUrmatoare.setPosition({proiectorCore.getPozitie().x + 50.f, proiectorCore.getPozitie().y + 50.f});
     window.draw(formaBilaUrmatoare);
 
     for (const auto& p : nivel.getProiectileInZbor()) {
-        sf::CircleShape formaProiectil(p.first.getRaza());
-        formaProiectil.setFillColor(getSfmlColor(p.first.getCuloare()));
-        formaProiectil.setOrigin({p.first.getRaza(), p.first.getRaza()});
-        formaProiectil.setPosition({p.first.getPozitie().x, p.first.getPozitie().y});
+        const Bila& b = p.first;
+        sf::CircleShape formaProiectil(b.getRaza());
+        formaProiectil.setFillColor(getSfmlColor(b.getCuloare()));
+        formaProiectil.setOrigin({b.getRaza(), b.getRaza()});
+        formaProiectil.setPosition({b.getPozitie().x, b.getPozitie().y});
         window.draw(formaProiectil);
     }
 

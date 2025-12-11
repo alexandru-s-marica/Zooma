@@ -10,12 +10,12 @@ private:
     std::default_random_engine generator;
     std::uniform_int_distribution<int> distributieCuloare;
 
-    void genereazaBilaNoua();
+    void genereazaBilaNoua(const std::vector<Culoare>& culoriPermise = {});
 
 public:
     explicit Proiector(Vec2f pos);
 
-    Bila trage();
+    Bila trage(const std::vector<Culoare>& culoriPermise);
     void schimbaBila();
     void rotesteSpre(Vec2f tinta);
     Vec2f getPozitie() const;

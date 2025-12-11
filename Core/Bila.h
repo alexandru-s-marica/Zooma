@@ -8,6 +8,9 @@ private:
     Vec2f pozitie;
     float raza;
 
+    bool seDistruge;
+    float timpPanaLaMoarte;
+
 public:
     //Bila()=default;
     //am folosit doar pentru testul de afisare
@@ -20,6 +23,11 @@ public:
     float getRaza() const;
 
     Bounds getBounds() const;
+
+    void marcheazaPentruDistrugere();
+    bool esteInDistrugere() const;
+    void actualizeazaTimer(float deltaTime);
+    bool eGataDeSters() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Bila& b);
 };

@@ -12,8 +12,17 @@ Proiector::Proiector(Vec2f pos)
     genereazaBilaNoua();
 }
 
-void Proiector::genereazaBilaNoua() {
-    Culoare c = static_cast<Culoare>(distributieCuloare(generator));
+void Proiector::genereazaBilaNoua(const std::vector<Culoare>& culoriPermise) {
+    Culoare c;
+
+    if (culoriPermise.empty()) {
+        c = static_cast<Culoare>(distributieCuloare(generator));
+    } else {
+        std::uniform_int_distribution<int> dist(0, culoriPermise.size() - 1);
+        int index = dist(generator);
+        c = culoriPermise[index];
+    }
+
     if (bilaCurenta.getCuloare() == Culoare::UNKNOWN) {
         bilaCurenta = Bila(c, pozitie, 20.f);
     } else {
@@ -21,35 +30,31 @@ void Proiector::genereazaBilaNoua() {
     }
 }
 
-// cppcheck-suppress unusedFunction
-Bila Proiector::trage() {
+Bila Proiector::trage(const std::vector<Culoare>& culoriPermise) {
     Bila bilaTrasa = bilaCurenta;
     bilaCurenta = bilaUrmatoare;
-    genereazaBilaNoua();
+
+    genereazaBilaNoua(culoriPermise);
+
     return bilaTrasa;
 }
 
-// cppcheck-suppress unusedFunction
 void Proiector::schimbaBila() {
     std::swap(bilaCurenta, bilaUrmatoare);
 }
 
-// cppcheck-suppress unusedFunction
 void Proiector::rotesteSpre(Vec2f tinta) {
     (void)tinta;
 }
 
-// cppcheck-suppress unusedFunction
 Vec2f Proiector::getPozitie() const {
     return pozitie;
 }
 
-// cppcheck-suppress unusedFunction
 const Bila& Proiector::getBilaCurenta() const {
     return bilaCurenta;
 }
 
-// cppcheck-suppress unusedFunction
 const Bila& Proiector::getBilaUrmatoare() const {
     return bilaUrmatoare;
 }

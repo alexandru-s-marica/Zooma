@@ -2,6 +2,7 @@
 #include "Bila.h"
 #include <list>
 #include <vector>
+#include <set>
 
 class SirDeBile {
 private:
@@ -14,7 +15,10 @@ private:
 
     Vec2f getPozitiePeTraseu(float progres) const;
 
+    void verificaExplozieLant(std::list<Bila>::iterator stanga, std::list<Bila>::iterator dreapta);
+
 public:
+
     SirDeBile();
     SirDeBile(std::vector<Vec2f> traseu, float viteza, float distanta);
 
@@ -31,6 +35,8 @@ public:
     bool aAtingJucatorulSfarsitul() const;
 
     friend std::ostream& operator<<(std::ostream&, const SirDeBile&);
+
+    std::vector<Culoare> getCuloriActive() const;
 };
 
 //std::ostream& operator<<(std::ostream&, const SirDeBile&);

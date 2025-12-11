@@ -36,6 +36,8 @@ public:
     const std::list<std::pair<Bila, Vec2f>>& getProiectileInZbor() const;
     int getScor() const;
 
+    Bila trageBilaJucator();
+
     StareJoc getStareJoc() const;
     void reset(float initialBallSpacing);
     bool esteCastigat() const;
