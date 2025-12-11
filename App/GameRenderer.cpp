@@ -69,7 +69,7 @@ void GameRenderer::actualizeazaStareUI() {
     if (stare == StareJoc::GAME_OVER) {
         mesajManager.afiseaza("GAME OVER\nApasa 'R' pentru Restart", {600.f, 400.f});
     }
-    else if (stare == StareJoc::CASTIGAT) {
+    else if (nivel.esteCastigat()) {
         mesajManager.afiseaza("VICTORIE!\nApasa 'R' pentru Restart", {600.f, 400.f});
     }
     else {
