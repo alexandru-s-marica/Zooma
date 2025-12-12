@@ -29,14 +29,24 @@ Nivel::Nivel(float initialBallSpacing)
     std::cout << "Nivel: Constructor cu specificarea distantei intre bile\n";
     genereazaTraseu();
     sirBile = SirDeBile(traseu, 40.f, initialBallSpacing);
+
+    std::vector<Culoare> culori = sirBile.getCuloriActive();
+    if (!culori.empty()) {
+        proiector.valideazaCulori(culori);
+    }
 }
 
 void Nivel::ruleazaFrame(float deltaTime) {
-    if (stare == StareJoc::GAME_OVER) {
+    if (stare != StareJoc::RULEAZA) {
         return;
     }
 
     sirBile.actualizeaza(deltaTime);
+
+    std::vector<Culoare> culoriActive = sirBile.getCuloriActive();
+    if (!culoriActive.empty()) {
+        proiector.valideazaCulori(culoriActive);
+    }
 
     for (auto& proiectil : proiectileInZbor) {
         proiectil.first.setPozitie(proiectil.first.getPozitie() + proiectil.second * 1000.f * deltaTime);
@@ -129,10 +139,17 @@ void Nivel::reset(float initialBallSpacing) {
     scor = 0;
     stare = StareJoc::RULEAZA;
     proiectileInZbor.clear();
+
     proiector = Proiector({SCREEN_WIDTH / 2.f, SCREEN_HEIGHT - 100.f});
+
     traseu.clear();
     genereazaTraseu();
     sirBile = SirDeBile(traseu, 40.f, initialBallSpacing);
+
+    std::vector<Culoare> culori = sirBile.getCuloriActive();
+    if (!culori.empty()) {
+        proiector.valideazaCulori(culori);
+    }
 }
 
 bool Nivel::esteCastigat() const {

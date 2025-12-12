@@ -23,5 +23,7 @@ public:
     const Bila& getBilaCurenta() const;
     const Bila& getBilaUrmatoare() const;
 
+    void valideazaCulori(const std::vector<Culoare>& culoriPermise);
+
     friend std::ostream& operator<<(std::ostream& os, const Proiector& p);
 };

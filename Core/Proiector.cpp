@@ -1,5 +1,6 @@
 #include "Proiector.h"
 #include <ctime>
+#include <algorithm>
 
 Proiector::Proiector(Vec2f pos)
     : pozitie(pos),
@@ -57,6 +58,40 @@ const Bila& Proiector::getBilaCurenta() const {
 
 const Bila& Proiector::getBilaUrmatoare() const {
     return bilaUrmatoare;
+}
+
+void Proiector::valideazaCulori(const std::vector<Culoare>& culoriPermise) {
+    if (culoriPermise.empty()) return;
+
+    // Verificăm bila curentă
+    bool curentaValida = false;
+    for (Culoare c : culoriPermise) {
+        if (bilaCurenta.getCuloare() == c) {
+            curentaValida = true;
+            break;
+        }
+    }
+
+    if (!curentaValida) {
+        genereazaBilaNoua(culoriPermise);
+
+        bilaCurenta = bilaUrmatoare;
+        genereazaBilaNoua(culoriPermise);
+    }
+
+    bool urmatoareaValida = false;
+    for (Culoare c : culoriPermise) {
+        if (bilaUrmatoare.getCuloare() == c) {
+            urmatoareaValida = true;
+            break;
+        }
+    }
+
+    if (!urmatoareaValida) {
+        Bila temp = bilaCurenta;
+        genereazaBilaNoua(culoriPermise);
+        bilaCurenta = temp;
+    }
 }
 
 std::ostream& operator<<(std::ostream& os, const Proiector& p){

@@ -98,14 +98,11 @@ void SirDeBile::verificaExplozieLant(std::list<Bila>::iterator stanga, std::list
 void SirDeBile::actualizeaza(float deltaTime) {
     if (bile.empty()) return;
 
-    bool sAuStersBile = false;
-
     for (auto it = bile.begin(); it != bile.end(); ) {
         if (it->esteInDistrugere()) {
             it->actualizeazaTimer(deltaTime);
             if (it->eGataDeSters()) {
                 it = bile.erase(it);
-                sAuStersBile = true;
             } else {
                 ++it;
             }
@@ -124,32 +121,35 @@ void SirDeBile::actualizeaza(float deltaTime) {
         currentProgres -= distantaIntreBile;
     }
 
-    if (sAuStersBile) {
-        if (bile.size() < 2) return;
-
-        auto it = bile.begin();
-        auto next = std::next(it);
-
-        while (next != bile.end()) {
-            if (!it->esteInDistrugere() && !next->esteInDistrugere()) {
-                if (it->getCuloare() == next->getCuloare()) {
-                    verificaExplozieLant(it, next);
-                }
-            }
-            it++;
-            next++;
-        }
-    }
-
     for (auto it = bile.begin(); it != std::prev(bile.end()); ++it) {
         auto next_it = std::next(it);
+
         if (it->esteInDistrugere() || next_it->esteInDistrugere()) continue;
 
-        float distSq = (it->getPozitie() - next_it->getPozitie()).magnitude();
-        distSq *= distSq;
-        float diametru = 2.0f * it->getRaza();
+        Bila& b1 = *it;
+        Bila& b2 = *next_it;
 
-        if (distSq > (diametru * diametru + 5.0f)) {
+        float distSq = (b1.getPozitie() - b2.getPozitie()).magnitude();
+        distSq *= distSq;
+        float diametru = 2.0f * b1.getRaza();
+        float diametruSq = diametru * diametru;
+
+        if (distSq > diametruSq + 10.0f) {
+
+            Vec2f directie = (b1.getPozitie() - b2.getPozitie()).normalize();
+            float vitezaAtragere = 400.0f * deltaTime;
+            b2.setPozitie(b2.getPozitie() + directie * vitezaAtragere);
+
+            float nouaDistSq = (b1.getPozitie() - b2.getPozitie()).magnitude();
+            nouaDistSq *= nouaDistSq;
+
+            if (nouaDistSq <= diametruSq + 5.0f) {
+                b2.setPozitie(b1.getPozitie() - directie * diametru);
+
+                if (b1.getCuloare() == b2.getCuloare()) {
+                    verificaExplozieLant(it, next_it);
+                }
+            }
         }
     }
 }
