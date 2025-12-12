@@ -55,6 +55,16 @@ Vec2f SirDeBile::getPozitiePeTraseu(float progres) const {
     return traseu.back();
 }
 
+std::vector<Culoare> SirDeBile::getCuloriActive() const {
+    std::set<Culoare> culoriUnice;
+    for (const auto& bila : bile) {
+        if (!bila.esteInDistrugere()) {
+            culoriUnice.insert(bila.getCuloare());
+        }
+    }
+    return std::vector<Culoare>(culoriUnice.begin(), culoriUnice.end());
+}
+
 void SirDeBile::verificaExplozieLant(std::list<Bila>::iterator stanga, std::list<Bila>::iterator dreapta) {
     if (bile.empty()) return;
     if (stanga == bile.end() || dreapta == bile.end()) return;
@@ -88,7 +98,7 @@ void SirDeBile::verificaExplozieLant(std::list<Bila>::iterator stanga, std::list
     for (auto it = it_start; it != it_end; ++it) count++;
 
     if (count >= 3) {
-        std::cout << "COMBO! " << count << " bile activate.\n";
+        std::cout << "COMBO LOCAL! " << count << " bile activate.\n";
         for (auto it = it_start; it != it_end; ++it) {
             it->marcheazaPentruDistrugere();
         }
@@ -101,8 +111,19 @@ void SirDeBile::actualizeaza(float deltaTime) {
     for (auto it = bile.begin(); it != bile.end(); ) {
         if (it->esteInDistrugere()) {
             it->actualizeazaTimer(deltaTime);
+
             if (it->eGataDeSters()) {
                 it = bile.erase(it);
+
+                if (it != bile.end() && it != bile.begin()) {
+                    auto prev = std::prev(it);
+
+                    if (!it->esteInDistrugere() && !prev->esteInDistrugere()) {
+                        if (it->getCuloare() == prev->getCuloare()) {
+                            verificaExplozieLant(prev, it);
+                        }
+                    }
+                }
             } else {
                 ++it;
             }
@@ -123,7 +144,6 @@ void SirDeBile::actualizeaza(float deltaTime) {
 
     for (auto it = bile.begin(); it != std::prev(bile.end()); ++it) {
         auto next_it = std::next(it);
-
         if (it->esteInDistrugere() || next_it->esteInDistrugere()) continue;
 
         Bila& b1 = *it;
@@ -135,7 +155,6 @@ void SirDeBile::actualizeaza(float deltaTime) {
         float diametruSq = diametru * diametru;
 
         if (distSq > diametruSq + 10.0f) {
-
             Vec2f directie = (b1.getPozitie() - b2.getPozitie()).normalize();
             float vitezaAtragere = 400.0f * deltaTime;
             b2.setPozitie(b2.getPozitie() + directie * vitezaAtragere);
@@ -197,19 +216,6 @@ int SirDeBile::insereazaSiVerifica(std::list<Bila>::iterator it_target, const Bi
 
 bool SirDeBile::aAtingJucatorulSfarsitul() const {
     return (progresCapSnake >= lungimeTotalaTraseu) && (lungimeTotalaTraseu > 0);
-}
-
-std::vector<Culoare> SirDeBile::getCuloriActive() const {
-    std::set<Culoare> culoriUnice;
-
-    for (const auto& bila : bile) {
-        if (!bila.esteInDistrugere()) {
-            culoriUnice.insert(bila.getCuloare());
-        }
-    }
-
-    std::vector<Culoare> rezultat(culoriUnice.begin(), culoriUnice.end());
-    return rezultat;
 }
 
 std::ostream& operator<<(std::ostream& os, const SirDeBile& sirBile){
