@@ -3,6 +3,7 @@
 #include <list>
 #include <vector>
 #include <set>
+#include <iostream>
 
 class Nivel;
 
@@ -11,11 +12,13 @@ private:
     std::list<Bila> bile;
     std::vector<Vec2f> traseu;
     float viteza;
-    float progresCapSnake;
+
     float distantaIntreBile;
     float lungimeTotalaTraseu;
 
     float distantaRetroRamasa;
+
+    float timerGenerareEfectRandom;
 
     Vec2f getPozitiePeTraseu(float progres) const;
     void verificaExplozieLant(std::list<Bila>::iterator stanga, std::list<Bila>::iterator dreapta);
@@ -24,7 +27,6 @@ public:
     SirDeBile();
     SirDeBile(std::vector<Vec2f> traseu, float viteza, float distanta);
 
-    // ... Restul metodelor rămân la fel ...
     SirDeBile(const SirDeBile& other) = default;
     SirDeBile& operator=(const SirDeBile& other) = default;
     ~SirDeBile() = default;
@@ -42,8 +44,4 @@ public:
     void aplicaRetro(float distantaInapoi);
 
     friend std::ostream& operator<<(std::ostream& os, const SirDeBile& s);
-
-    //std::ostream& operator<<(std::ostream& os) const;
 };
-
-//std::ostream& operator<<(std::ostream&, const SirDeBile&);

@@ -19,7 +19,9 @@ Nivel::Nivel()
       scor(0),
       stare(StareJoc::RULEAZA),
       modAccuracyActiv(false),
-      timpRamasAccuracy(0.0f)
+      timpRamasAccuracy(0.0f),
+      esteInghetat(false),
+      timpRamasInghet(0.0f)
 {
     std::cout << "Nivel: Constructor default\n";
     genereazaTraseu();
@@ -30,7 +32,9 @@ Nivel::Nivel(float initialBallSpacing)
       scor(0),
       stare(StareJoc::RULEAZA),
       modAccuracyActiv(false),
-      timpRamasAccuracy(0.0f)
+      timpRamasAccuracy(0.0f),
+      esteInghetat(false),
+      timpRamasInghet(0.0f)
 {
     std::cout << "Nivel: Constructor parametri\n";
     genereazaTraseu();
@@ -46,6 +50,16 @@ void Nivel::ruleazaFrame(float deltaTime) {
     if (stare != StareJoc::RULEAZA) return;
 
     float timeStepBile = deltaTime;
+
+    if (esteInghetat) {
+        timpRamasInghet -= deltaTime;
+        if (timpRamasInghet <= 0.f) {
+            esteInghetat = false;
+            std::cout << "[Nivel] INGHET DEZACTIVAT\n";
+        } else {
+            timeStepBile = 0.0f; // STOP
+        }
+    }
 
     float vitezaProiectil = 1000.f;
     if (modAccuracyActiv) vitezaProiectil = 2500.f;
@@ -130,6 +144,8 @@ void Nivel::reset(float initialBallSpacing) {
     stare = StareJoc::RULEAZA;
     modAccuracyActiv = false;
     timpRamasAccuracy = 0.0f;
+    esteInghetat = false;
+    timpRamasInghet = 0.0f;
 
     proiectileInZbor.clear();
     exploziiVizuale.clear();
@@ -163,4 +179,10 @@ void Nivel::activeazaModAccuracy(float durata) {
     std::cout << "ACCURACY ACTIVAT!\n";
     modAccuracyActiv = true;
     timpRamasAccuracy = durata;
+}
+
+void Nivel::activeazaInghet(float durata) {
+    std::cout << "INGHET ACTIVAT TIMP DE " << durata << " SECUNDE\n";
+    esteInghetat = true;
+    timpRamasInghet = durata;
 }

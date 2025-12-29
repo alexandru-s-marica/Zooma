@@ -55,3 +55,13 @@ public:
 protected:
     void doAplica(Nivel& nivel, Vec2f pozitie) override;
 };
+
+class EfectInghet : public EfectBila {
+public:
+    EfectInghet() : EfectBila("Inghet (Freeze)") {}
+    std::unique_ptr<EfectBila> clone() const override {
+        return std::make_unique<EfectInghet>(*this);
+    }
+protected:
+    void doAplica(Nivel& nivel, Vec2f pozitie) override;
+};

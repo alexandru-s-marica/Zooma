@@ -14,3 +14,8 @@ void EfectAccuracy::doAplica(Nivel& nivel, Vec2f pozitie) {
     (void)pozitie;
     nivel.activeazaModAccuracy(5.0f);
 }
+
+void EfectInghet::doAplica(Nivel& nivel, Vec2f pozitie) {
+    (void)pozitie;
+    nivel.activeazaInghet(3.0f);
+}

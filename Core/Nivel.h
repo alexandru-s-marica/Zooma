@@ -29,12 +29,14 @@ private:
     bool modAccuracyActiv;
     float timpRamasAccuracy;
 
+    bool esteInghetat;
+    float timpRamasInghet;
+
     void genereazaTraseu();
     void gestioneazaColiziuni();
 
 public:
     Nivel();
-
     explicit Nivel(float initialBallSpacing);
 
     void reset(float initialBallSpacing);
@@ -57,6 +59,8 @@ public:
     void activeazaExplozieLa(Vec2f pozitie);
     void activeazaRetro();
     void activeazaModAccuracy(float durata);
+
+    void activeazaInghet(float durata);
 
     friend std::ostream& operator<<(std::ostream& os, const Nivel& n);
 };
