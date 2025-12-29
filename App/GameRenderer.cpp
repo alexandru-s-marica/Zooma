@@ -135,8 +135,8 @@ void GameRenderer::draw() {
         sf::Vector2f mouseWorld = window.mapPixelToCoords(mousePixel);
 
         sf::Vertex linie[] = {
-            sf::Vertex(sf::Vector2f(posProiector.x, posProiector.y), sf::Color::Red),
-            sf::Vertex(mouseWorld, sf::Color::Red)
+            sf::Vertex{sf::Vector2f(posProiector.x, posProiector.y), sf::Color::Red},
+            sf::Vertex{mouseWorld, sf::Color::Red}
         };
 
         window.draw(linie, 2, sf::PrimitiveType::Lines);
