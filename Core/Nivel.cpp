@@ -45,6 +45,8 @@ Nivel::Nivel(float initialBallSpacing)
 void Nivel::ruleazaFrame(float deltaTime) {
     if (stare != StareJoc::RULEAZA) return;
 
+    float timeStepBile = deltaTime;
+
     float vitezaProiectil = 1000.f;
     if (modAccuracyActiv) vitezaProiectil = 2500.f;
 
@@ -61,12 +63,12 @@ void Nivel::ruleazaFrame(float deltaTime) {
     }
 
     for (auto it = exploziiVizuale.begin(); it != exploziiVizuale.end(); ) {
-        it->timer -= deltaTime * 1.5f; // Viteza disparitie explozie
+        it->timer -= deltaTime * 1.5f;
         if (it->timer <= 0.f) it = exploziiVizuale.erase(it);
         else ++it;
     }
 
-    sirBile.actualizeaza(deltaTime, *this);
+    sirBile.actualizeaza(timeStepBile, *this);
 
     std::vector<Culoare> culoriActive = sirBile.getCuloriActive();
     if (!culoriActive.empty()) proiector.valideazaCulori(culoriActive);
@@ -130,7 +132,7 @@ void Nivel::reset(float initialBallSpacing) {
     timpRamasAccuracy = 0.0f;
 
     proiectileInZbor.clear();
-    exploziiVizuale.clear(); // Resetare efecte
+    exploziiVizuale.clear();
 
     proiector = Proiector({SCREEN_WIDTH / 2.f, SCREEN_HEIGHT - 100.f});
     traseu.clear();

@@ -34,7 +34,8 @@ private:
 
 public:
     Nivel();
-    Nivel(float initialBallSpacing);
+
+    explicit Nivel(float initialBallSpacing);
 
     void reset(float initialBallSpacing);
     void ruleazaFrame(float deltaTime);

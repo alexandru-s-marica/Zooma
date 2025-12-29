@@ -17,12 +17,12 @@ public:
     virtual ~EfectBila() = default;
     virtual std::unique_ptr<EfectBila> clone() const = 0;
 
+    const std::string& getNume() const { return numeEfect; }
+
     void activeaza(Nivel& nivel, Vec2f pozitie) {
-        std::cout << "[Efect] Activare: " << numeEfect << " la " << pozitie << "\n";
+        std::cout << "[Efect] Activare: " << getNume() << " la " << pozitie << "\n";
         doAplica(nivel, pozitie);
     }
-
-    std::string getNume() const { return numeEfect; }
 };
 
 class EfectExplozie : public EfectBila {
