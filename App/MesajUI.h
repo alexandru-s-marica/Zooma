@@ -5,12 +5,14 @@
 class MesajUI {
 private:
     sf::Font font;
-    sf::Text text;
-    bool esteVizibil;
+    bool activ;
+    sf::Text textMesaj;
 
 public:
     MesajUI();
+
     void afiseaza(const std::string& mesaj, sf::Vector2f pozitie);
     void ascunde();
+
     void draw(sf::RenderWindow& window) const;
 };

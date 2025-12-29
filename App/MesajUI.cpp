@@ -1,37 +1,40 @@
 #include "MesajUI.h"
+#include "../Core/Exceptions.h"
 #include <iostream>
 
-MesajUI::MesajUI() : text(font), esteVizibil(false) {
+MesajUI::MesajUI()
+    : font(),
+      activ(false),
+      textMesaj(font)
+{
     if (!font.openFromFile("arial.ttf")) {
-        std::cerr << "[Eroare UI] Nu s-a putut incarca 'arial.ttf'!\n";
+        throw ResursaLipsaException("arial.ttf");
     }
 
-    text.setFont(font);
-    text.setCharacterSize(64);
-    text.setFillColor(sf::Color::White);
-    text.setOutlineColor(sf::Color::Black);
-    text.setOutlineThickness(2.f);
+    textMesaj.setCharacterSize(40);
+    textMesaj.setFillColor(sf::Color::White);
+    textMesaj.setOutlineColor(sf::Color::Black);
+    textMesaj.setOutlineThickness(2.f);
 }
 
-void MesajUI::afiseaza(const std::string& mesaj, sf::Vector2f pozitie) {
-    text.setString(mesaj);
+void MesajUI::afiseaza(const std::string& text, sf::Vector2f pozitie) {
+    textMesaj.setString(text);
 
-    sf::FloatRect bounds = text.getLocalBounds();
+    sf::FloatRect bounds = textMesaj.getLocalBounds();
 
-    text.setOrigin({bounds.position.x + bounds.size.x / 2.0f,
-                   bounds.position.y + bounds.size.y / 2.0f});
+    textMesaj.setOrigin({bounds.size.x / 2.f, bounds.size.y / 2.f});
 
-    text.setPosition(pozitie);
+    textMesaj.setPosition(pozitie);
 
-    esteVizibil = true;
+    activ = true;
 }
 
 void MesajUI::ascunde() {
-    esteVizibil = false;
+    activ = false;
 }
 
 void MesajUI::draw(sf::RenderWindow& window) const {
-    if (esteVizibil) {
-        window.draw(text);
+    if (activ) {
+        window.draw(textMesaj);
     }
 }

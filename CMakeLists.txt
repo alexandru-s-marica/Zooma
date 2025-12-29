@@ -66,6 +66,9 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         Core/SirDeBile.cpp
         App/GameRenderer.cpp
         App/MesajUI.cpp
+        Core/Efecte.h
+        Core/Efecte.cpp
+        Core/Exceptions.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
