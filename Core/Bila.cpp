@@ -8,7 +8,8 @@ Bila::Bila(Culoare c, Vec2f pos, float r, float progres)
     : culoare(c), pozitie(pos), raza(r),
       seDistruge(false), timpPanaLaMoarte(0.0f),
       progresPeTraseu(progres),
-      timerViataEfect(15.0f), // 15 secunde default
+      timerViataEfect(15.0f),
+      scaleVisual(0.1f), // INCEPE MIC
       efect(nullptr)
 {}
 
@@ -17,6 +18,7 @@ Bila::Bila(Culoare c, Vec2f pos, float r, float progres, std::unique_ptr<EfectBi
       seDistruge(false), timpPanaLaMoarte(0.0f),
       progresPeTraseu(progres),
       timerViataEfect(15.0f),
+      scaleVisual(0.1f), // INCEPE MIC
       efect(std::move(efectInitial))
 {}
 
@@ -24,7 +26,8 @@ Bila::Bila(const Bila& other)
     : culoare(other.culoare), pozitie(other.pozitie), raza(other.raza),
       seDistruge(other.seDistruge), timpPanaLaMoarte(other.timpPanaLaMoarte),
       progresPeTraseu(other.progresPeTraseu),
-      timerViataEfect(other.timerViataEfect)
+      timerViataEfect(other.timerViataEfect),
+      scaleVisual(other.scaleVisual) // Copiem starea animatiei
 {
     if (other.efect) {
         efect = other.efect->clone();
@@ -45,6 +48,7 @@ void swap(Bila& first, Bila& second) noexcept {
     swap(first.efect, second.efect);
     swap(first.progresPeTraseu, second.progresPeTraseu);
     swap(first.timerViataEfect, second.timerViataEfect);
+    swap(first.scaleVisual, second.scaleVisual);
 }
 
 Bila& Bila::operator=(Bila other) {
@@ -74,6 +78,11 @@ bool Bila::esteInDistrugere() const { return seDistruge; }
 void Bila::actualizeaza(float deltaTime) {
     if (seDistruge) {
         timpPanaLaMoarte -= deltaTime;
+    } else {
+        if (scaleVisual < 1.0f) {
+            scaleVisual += deltaTime * 5.0f; // Viteza de crestere
+            if (scaleVisual > 1.0f) scaleVisual = 1.0f;
+        }
     }
 
     if (efect && !seDistruge) {
@@ -116,8 +125,6 @@ int Bila::getBileDistruseTotal() {
 }
 
 std::ostream& operator<<(std::ostream& os, const Bila& b) {
-    os << "Bila (Culoare: " << b.culoare
-       << ", Pozitie: " << b.pozitie
-       << ", Raza: " << b.raza << ")";
+    os << "Bila (Pos: " << b.pozitie << ", Progres: " << b.progresPeTraseu << ")";
     return os;
 }

@@ -88,7 +88,12 @@ void GameRenderer::draw() {
         if (bilaCore.esteInDistrugere()) {
             c.a = 100;
             formaBila.setScale({0.8f, 0.8f});
+        } else {
+            // APLICARE ANIMATIE POP-IN
+            float s = bilaCore.getScaleVisual();
+            formaBila.setScale({s, s});
         }
+
         formaBila.setFillColor(c);
 
         if (bilaCore.areEfect()) {

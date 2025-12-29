@@ -34,6 +34,7 @@ SirDeBile::SirDeBile(std::vector<Vec2f> traseu, float viteza, float distanta)
             20.f,
             progresCurent
         );
+        Bila& b = bile.back();
         progresCurent -= distantaIntreBile;
     }
 }
@@ -81,30 +82,25 @@ void SirDeBile::verificaExplozieLant(std::list<Bila>::iterator stanga, std::list
     int count = 0;
     for (auto it = it_start; it != it_end; ++it) count++;
     if (count >= 3) {
-        std::cout << "[Combo] Explozie magnetica! " << count << " bile distruse.\n";
         for (auto it = it_start; it != it_end; ++it) it->marcheazaPentruDistrugere();
     }
 }
 
-// Functie helper pentru a numara cate bile de aceeasi culoare sunt adiacente
-int numaraAdiacente(std::list<Bila>& lista, std::list<Bila>::iterator startIt, bool directieSpreSpate) {
+// Helper pentru numarat bile
+int numaraBileAdiacente(std::list<Bila>& lista, std::list<Bila>::iterator startIt, bool spreCoada) {
     if (startIt == lista.end()) return 0;
     Culoare c = startIt->getCuloare();
-    int count = 0;
+    int cnt = 0;
     auto it = startIt;
-
-    while (it != lista.end()) {
-        if (it->getCuloare() != c || it->esteInDistrugere()) break;
-        count++;
-
-        if (directieSpreSpate) {
-            it++;
-        } else {
+    while(it != lista.end() && !it->esteInDistrugere() && it->getCuloare() == c) {
+        cnt++;
+        if (spreCoada) it++;
+        else {
             if (it == lista.begin()) break;
             it--;
         }
     }
-    return count;
+    return cnt;
 }
 
 void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
@@ -126,17 +122,15 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
     float deltaMiscare = viteza * deltaTime;
 
     if (distantaRetroRamasa > 0.f) {
-        float vitezaRewind = viteza * 4.0f;
-        float pas = vitezaRewind * deltaTime;
-        if (pas > distantaRetroRamasa) pas = distantaRetroRamasa;
-        deltaMiscare = -pas;
+        float pas = std::min(distantaRetroRamasa, viteza * 4.0f * deltaTime);
         distantaRetroRamasa -= pas;
+        deltaMiscare = -pas;
 
-        for (auto& bila : bile) {
-            if (!bila.esteInDistrugere()) {
-                bila.avanseaza(deltaMiscare);
-                if (bila.getProgres() < 0.f) bila.setProgres(0.f);
-                bila.setPozitie(getPozitiePeTraseu(bila.getProgres()));
+        for (auto& b : bile) {
+            if (!b.esteInDistrugere()) {
+                b.avanseaza(deltaMiscare);
+                if (b.getProgres() < 0.f) b.setProgres(0.f);
+                b.setPozitie(getPozitiePeTraseu(b.getProgres()));
             }
         }
     }
@@ -148,60 +142,53 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
             it->setPozitie(getPozitiePeTraseu(it->getProgres()));
         }
 
-        auto prev_it = it;
+        auto prev_it = it; // Bila din spate
         ++it;
 
         while (it != bile.rend()) {
             if (it->esteInDistrugere()) { ++it; continue; }
 
             float dist = it->getProgres() - prev_it->getProgres();
-            float distantaIdeala = distantaIntreBile;
+            float ideal = distantaIntreBile;
 
-            if (dist <= distantaIdeala + 0.5f) {
-                float nouProgres = prev_it->getProgres() + distantaIdeala;
-                it->setProgres(nouProgres);
-                it->setPozitie(getPozitiePeTraseu(nouProgres));
-
+            if (dist <= ideal + 0.5f) {
+                float newP = prev_it->getProgres() + ideal;
+                it->setProgres(newP);
+                it->setPozitie(getPozitiePeTraseu(newP));
                 prev_it = it;
             }
             else {
-                bool activareMagnet = false;
-
+                bool activeazaMagnet = false;
                 if (it->getCuloare() == prev_it->getCuloare()) {
-                    auto it_spate_forward = std::prev(prev_it.base());
-                    auto it_fata_forward = std::prev(it.base());
+                    auto fwd_it = std::prev(it.base());
+                    auto fwd_prev = std::prev(prev_it.base());
 
-                    int countSpate = numaraAdiacente(bile, it_spate_forward, true);
+                    int c1 = numaraBileAdiacente(bile, fwd_prev, true);
+                    int c2 = numaraBileAdiacente(bile, fwd_it, false);
 
-                    int countFata = numaraAdiacente(bile, it_fata_forward, false);
-
-                    if ((countSpate + countFata) >= 3) {
-                        activareMagnet = true;
-                    }
+                    if (c1 + c2 >= 3) activeazaMagnet = true;
                 }
 
-                if (activareMagnet) {
-                    float vitezaAtragere = viteza * 3.0f;
-                    float pasAtragere = vitezaAtragere * deltaTime;
+                if (activeazaMagnet) {
+                    float vitezaMagnet = 500.0f;
+                    float pasBack = vitezaMagnet * deltaTime;
+                    float target = prev_it->getProgres() + ideal;
 
-                    float progresNou = it->getProgres() - pasAtragere;
-                    float target = prev_it->getProgres() + distantaIdeala;
+                    float nouProgres = it->getProgres() - pasBack;
 
-                    if (progresNou <= target) {
+                    if (nouProgres <= target) {
                         it->setProgres(target);
                         it->setPozitie(getPozitiePeTraseu(target));
 
-                        auto it_fata_fw = std::prev(it.base());
-                        auto it_spate_fw = std::prev(prev_it.base());
-                        verificaExplozieLant(it_fata_fw, it_spate_fw);
+                        auto fwd_it = std::prev(it.base());
+                        auto fwd_prev = std::prev(prev_it.base());
+                        verificaExplozieLant(fwd_it, fwd_prev);
                     } else {
-                        it->setProgres(progresNou);
-                        it->setPozitie(getPozitiePeTraseu(progresNou));
+                        it->setProgres(nouProgres);
+                        it->setPozitie(getPozitiePeTraseu(nouProgres));
                     }
-
                     prev_it = it;
-                }
-                else {
+                } else {
                     prev_it = it;
                 }
             }

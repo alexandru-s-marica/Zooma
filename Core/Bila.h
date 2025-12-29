@@ -16,6 +16,8 @@ private:
     float progresPeTraseu;
     float timerViataEfect;
 
+    float scaleVisual;
+
     std::unique_ptr<EfectBila> efect;
     static int bileDistruseTotal;
 
@@ -30,18 +32,20 @@ public:
 
     void setPozitie(Vec2f pos);
     Vec2f getPozitie() const;
-
     void setProgres(float p);
     float getProgres() const;
     void avanseaza(float deltaDistanta);
 
     Culoare getCuloare() const;
     float getRaza() const;
+
+    // Getter pentru animatie
+    float getScaleVisual() const { return scaleVisual; }
+
     Bounds getBounds() const;
 
     void marcheazaPentruDistrugere();
     bool esteInDistrugere() const;
-
     void actualizeaza(float deltaTime);
     bool eGataDeSters() const;
 
