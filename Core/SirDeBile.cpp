@@ -85,7 +85,8 @@ void SirDeBile::verificaExplozieLant(std::list<Bila>::iterator stanga, std::list
     }
 }
 
-int numaraBileAdiacente(std::list<Bila>& lista, std::list<Bila>::iterator startIt, bool spreCoada) {
+// FIX CPPCHECK: Parameter 'lista' declared as reference to const, iterator changed to const_iterator
+int numaraBileAdiacente(const std::list<Bila>& lista, std::list<Bila>::const_iterator startIt, bool spreCoada) {
     if (startIt == lista.end()) return 0;
     Culoare c = startIt->getCuloare();
     int cnt = 0;
@@ -150,7 +151,6 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
             float ideal = distantaIntreBile;
 
             if (dist <= ideal + 0.5f) {
-                // CONTACT: Se imping
                 float newP = prev_it->getProgres() + ideal;
                 it->setProgres(newP);
                 it->setPozitie(getPozitiePeTraseu(newP));
