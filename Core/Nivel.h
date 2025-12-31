@@ -32,15 +32,14 @@ private:
     bool esteInghetat;
     float timpRamasInghet;
 
-    void genereazaTraseu();
+    void genereazaTraseu(int nivel);
     void gestioneazaColiziuni();
 
 public:
     Nivel();
+    explicit Nivel(float initialBallSpacing);
 
-    // Initializare specifica unui nivel
     void incarcaNivel(int numarNivel);
-
     void reset();
 
     void ruleazaFrame(float deltaTime);
@@ -54,6 +53,8 @@ public:
 
     int getScor() const;
     int getNivelCurent() const { return nivelCurent; }
+
+    const std::vector<Vec2f>& getTraseu() const;
 
     StareJoc getStareJoc() const;
     bool esteTerminat() const;

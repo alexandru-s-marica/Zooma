@@ -1,29 +1,27 @@
 #pragma once
 #include "Bila.h"
-#include <random>
+#include <vector>
 
 class Proiector {
 private:
     Vec2f pozitie;
+    float unghi;
     Bila bilaCurenta;
     Bila bilaUrmatoare;
-    std::default_random_engine generator;
-    std::uniform_int_distribution<int> distributieCuloare;
 
-    void genereazaBilaNoua(const std::vector<Culoare>& culoriPermise = {});
+    void genereazaBilaUrmatoare(const std::vector<Culoare>& culoriDisponibile);
 
 public:
-    explicit Proiector(Vec2f pos);
+    Proiector(Vec2f pos);
 
-    Bila trage(const std::vector<Culoare>& culoriPermise);
-    void schimbaBila();
     void rotesteSpre(Vec2f tinta);
-    Vec2f getPozitie() const;
+    Bila trage(const std::vector<Culoare>& culoriDisponibile);
+    void schimbaBila();
+    void valideazaCulori(const std::vector<Culoare>& culoriActive);
 
+    void setPozitie(Vec2f pos);
+
+    Vec2f getPozitie() const;
     const Bila& getBilaCurenta() const;
     const Bila& getBilaUrmatoare() const;
-
-    void valideazaCulori(const std::vector<Culoare>& culoriPermise);
-
-    friend std::ostream& operator<<(std::ostream& os, const Proiector& p);
 };

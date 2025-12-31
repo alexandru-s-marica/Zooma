@@ -3,9 +3,10 @@
 #include <iostream>
 #include <algorithm>
 
-// Viteza creste cu nivelul
+const float PI = 3.14159265f;
+
 float calculeazaVitezaNivel(int nivel) {
-    return 60.0f + (nivel - 1) * 30.0f;
+    return 60.0f + (nivel - 1) * 25.0f;
 }
 
 float calculeazaDistantaBile(int nivel) {
@@ -13,17 +14,77 @@ float calculeazaDistantaBile(int nivel) {
     return 40.0f;
 }
 
-void Nivel::genereazaTraseu() {
+void Nivel::genereazaTraseu(int nivel) {
     traseu.clear();
-    for (int i = 0; i < 200; ++i) traseu.push_back({100.f + i * 3, 100.f});
-    for (int i = 0; i < 150; ++i) traseu.push_back({700.f, 100.f + i * 2});
-    for (int i = 0; i < 200; ++i) traseu.push_back({700.f - i * 3, 400.f});
-    for (int i = 0; i < 100; ++i) traseu.push_back({100.f, 400.f - i * 2});
+
+    Vec2f pozProiector = {400.f, 500.f};
+
+    if (nivel == 1) {
+        pozProiector = {400.f, 500.f};
+        for (int i = 0; i < 200; ++i) traseu.push_back({100.f + i * 3, 100.f});
+        for (int i = 0; i < 150; ++i) traseu.push_back({700.f, 100.f + i * 2});
+        for (int i = 0; i < 200; ++i) traseu.push_back({700.f - i * 3, 400.f});
+        for (int i = 0; i < 100; ++i) traseu.push_back({100.f, 400.f - i * 2});
+    }
+    else if (nivel == 2) {
+        pozProiector = {400.f, 300.f};
+        float razaStart = 350.f;
+        float unghiStart = 0.f;
+        float unghiTotal = 4.0f * PI;
+        int pasi = 600;
+        for (int i = 0; i < pasi; ++i) {
+            float t = (float)i / pasi;
+            float unghi = unghiStart + t * unghiTotal;
+            float raza = razaStart * (1.0f - t * 0.8f);
+            float x = 400.f + raza * std::cos(unghi);
+            float y = 300.f + raza * std::sin(unghi);
+            traseu.push_back({x, y});
+        }
+    }
+    else if (nivel == 3) {
+        pozProiector = {100.f, 550.f};
+        std::vector<Vec2f> points = {
+            {50.f, 50.f}, {750.f, 50.f},
+            {50.f, 200.f}, {750.f, 200.f},
+            {50.f, 350.f}, {750.f, 350.f},
+            {50.f, 500.f}, {750.f, 500.f}
+        };
+        for (size_t k = 0; k < points.size() - 1; ++k) {
+            Vec2f p1 = points[k];
+            Vec2f p2 = points[k+1];
+            float dist = (p2 - p1).magnitude();
+            int pasi = static_cast<int>(dist / 2.0f);
+            for (int i = 0; i < pasi; ++i) {
+                float t = (float)i / pasi;
+                traseu.push_back(p1 + (p2 - p1) * t);
+            }
+        }
+    }
+    else if (nivel == 4) {
+        pozProiector = {400.f, 100.f};
+        int pasi = 700;
+        for (int i = 0; i < pasi; ++i) {
+            float t = (float)i / pasi;
+            float x = 50.f + t * 700.f;
+            float y = 300.f + 200.f * std::sin(t * 4.0f * PI);
+            traseu.push_back({x, y});
+        }
+    }
+    else {
+        pozProiector = {400.f, 300.f};
+        for(int i=0; i<700; i+=2) traseu.push_back({50.f + i, 50.f});
+        for(int i=0; i<500; i+=2) traseu.push_back({750.f, 50.f + i});
+        for(int i=0; i<700; i+=2) traseu.push_back({750.f - i, 550.f});
+        for(int i=0; i<400; i+=2) traseu.push_back({50.f, 550.f - i});
+        for(int i=0; i<300; i+=2) traseu.push_back({50.f + i, 150.f});
+    }
+
+    proiector.setPozitie(pozProiector);
 }
 
 Nivel::Nivel()
     : sirBile(),
-      proiector({SCREEN_WIDTH / 2.f, SCREEN_HEIGHT - 100.f}),
+      proiector({400.f, 500.f}),
       scor(0),
       stare(StareJoc::RULEAZA),
       nivelCurent(1),
@@ -32,7 +93,7 @@ Nivel::Nivel()
       esteInghetat(false),
       timpRamasInghet(0.0f)
 {
-    genereazaTraseu();
+    genereazaTraseu(1);
     incarcaNivel(1);
 }
 
@@ -52,9 +113,8 @@ void Nivel::reset() {
     proiectileInZbor.clear();
     exploziiVizuale.clear();
 
-    proiector = Proiector({SCREEN_WIDTH / 2.f, SCREEN_HEIGHT - 100.f});
+    genereazaTraseu(nivelCurent);
 
-    // Configurare SirDeBile in functie de nivel
     float viteza = calculeazaVitezaNivel(nivelCurent);
     float distanta = calculeazaDistantaBile(nivelCurent);
 
@@ -142,6 +202,7 @@ Proiector& Nivel::getProiector() { return proiector; }
 const Proiector& Nivel::getProiector() const { return proiector; }
 const std::list<std::pair<Bila, Vec2f>>& Nivel::getProiectileInZbor() const { return proiectileInZbor; }
 int Nivel::getScor() const { return scor; }
+const std::vector<Vec2f>& Nivel::getTraseu() const { return traseu; }
 StareJoc Nivel::getStareJoc() const { return stare; }
 bool Nivel::esteTerminat() const { return stare == StareJoc::GAME_OVER; }
 bool Nivel::esteCastigat() const { return stare == StareJoc::CASTIGAT; }

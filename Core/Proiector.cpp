@@ -1,78 +1,81 @@
 #include "Proiector.h"
-#include "Efecte.h"
+#include <cmath>
+#include <random>
 #include <ctime>
-#include <iostream>
-#include <algorithm>
 
 Proiector::Proiector(Vec2f pos)
-    : pozitie(pos),
-      bilaCurenta(Culoare::UNKNOWN, pos, 20.f),
-      bilaUrmatoare(Culoare::UNKNOWN, pos, 20.f),
-      generator(static_cast<unsigned int>(time(0))),
-      distributieCuloare(0, 5)
+    : pozitie(pos), unghi(0.f),
+      bilaCurenta(Culoare::ROSU, pos, 20.f),
+      bilaUrmatoare(Culoare::ALBASTRU, pos, 20.f)
 {
-    genereazaBilaNoua();
-    genereazaBilaNoua();
-}
-
-void Proiector::genereazaBilaNoua(const std::vector<Culoare>& culoriPermise) {
-    Culoare c;
-    if (culoriPermise.empty()) {
-        c = static_cast<Culoare>(distributieCuloare(generator));
-    } else {
-        std::uniform_int_distribution<int> dist(0, culoriPermise.size() - 1);
-        int index = dist(generator);
-        c = culoriPermise[index];
-    }
-
-    if (bilaCurenta.getCuloare() == Culoare::UNKNOWN) {
-        bilaCurenta = Bila(c, pozitie, 20.f);
-    } else {
-        bilaUrmatoare = Bila(c, pozitie, 20.f);
-    }
-}
-
-Bila Proiector::trage(const std::vector<Culoare>& culoriPermise) {
-    Bila bilaTrasa = bilaCurenta;
+    genereazaBilaUrmatoare({});
     bilaCurenta = bilaUrmatoare;
-    genereazaBilaNoua(culoriPermise);
-    return bilaTrasa;
+    genereazaBilaUrmatoare({});
 }
 
-void Proiector::valideazaCulori(const std::vector<Culoare>& culoriPermise) {
-    if (culoriPermise.empty()) return;
+void Proiector::genereazaBilaUrmatoare(const std::vector<Culoare>& culoriDisponibile) {
+    static std::mt19937 generator(static_cast<unsigned int>(std::time(nullptr)));
 
-    bool curentaValida = false;
-    for (Culoare c : culoriPermise) {
-        if (bilaCurenta.getCuloare() == c) { curentaValida = true; break; }
-    }
-    if (!curentaValida) {
-        genereazaBilaNoua(culoriPermise);
-        bilaCurenta = bilaUrmatoare;
-        genereazaBilaNoua(culoriPermise);
+    int tipCuloare;
+    if (culoriDisponibile.empty()) {
+        std::uniform_int_distribution<int> dist(0, 4);
+        tipCuloare = dist(generator);
+    } else {
+        std::uniform_int_distribution<size_t> dist(0, culoriDisponibile.size() - 1);
+        tipCuloare = static_cast<int>(culoriDisponibile[dist(generator)]);
     }
 
-    bool urmatoareaValida = false;
-    for (Culoare c : culoriPermise) {
-        if (bilaUrmatoare.getCuloare() == c) { urmatoareaValida = true; break; }
+    bilaUrmatoare = Bila(static_cast<Culoare>(tipCuloare), pozitie, 20.f);
+
+    std::uniform_int_distribution<int> distEfect(0, 100);
+    if (distEfect(generator) < 10) {
     }
-    if (!urmatoareaValida) {
-        Bila temp = bilaCurenta;
-        genereazaBilaNoua(culoriPermise);
-        bilaCurenta = temp;
-    }
+}
+
+void Proiector::rotesteSpre(Vec2f tinta) {
+    float dx = tinta.x - pozitie.x;
+    float dy = tinta.y - pozitie.y;
+    unghi = std::atan2(dy, dx);
+}
+
+Bila Proiector::trage(const std::vector<Culoare>& culoriDisponibile) {
+    Bila proiectil = bilaCurenta;
+    proiectil.setPozitie(pozitie);
+
+    bilaCurenta = bilaUrmatoare;
+    genereazaBilaUrmatoare(culoriDisponibile);
+
+    return proiectil;
 }
 
 void Proiector::schimbaBila() {
-    std::swap(bilaCurenta, bilaUrmatoare);
+    using std::swap;
+    swap(bilaCurenta, bilaUrmatoare);
+    bilaCurenta.setPozitie(pozitie);
 }
 
-void Proiector::rotesteSpre(Vec2f tinta) { (void)tinta; }
+void Proiector::valideazaCulori(const std::vector<Culoare>& culoriActive) {
+    bool curentaOk = false;
+    bool urmatoareOk = false;
+
+    for (Culoare c : culoriActive) {
+        if (bilaCurenta.getCuloare() == c) curentaOk = true;
+        if (bilaUrmatoare.getCuloare() == c) urmatoareOk = true;
+    }
+
+    if (!curentaOk && !culoriActive.empty()) {
+        bilaCurenta = Bila(culoriActive[0], pozitie, 20.f);
+    }
+    if (!urmatoareOk && !culoriActive.empty()) {
+        genereazaBilaUrmatoare(culoriActive);
+    }
+}
+
+void Proiector::setPozitie(Vec2f pos) {
+    pozitie = pos;
+    bilaCurenta.setPozitie(pos);
+}
+
 Vec2f Proiector::getPozitie() const { return pozitie; }
 const Bila& Proiector::getBilaCurenta() const { return bilaCurenta; }
 const Bila& Proiector::getBilaUrmatoare() const { return bilaUrmatoare; }
-
-std::ostream& operator<<(std::ostream& os, const Proiector& p){
-    os << "Proiector (Pozitie: " << p.pozitie << ", Bila Curenta: " << p.bilaCurenta.getCuloare() << ", Bila Urmatoare: " << p.bilaUrmatoare.getCuloare() << ")";
-    return os;
-}

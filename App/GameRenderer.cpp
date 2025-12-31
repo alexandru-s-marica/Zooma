@@ -45,6 +45,26 @@ void GameRenderer::actualizeazaStareUI() {
 }
 
 void GameRenderer::draw() {
+    const std::vector<Vec2f>& puncteTraseu = nivel.getTraseu();
+
+    if (!puncteTraseu.empty()) {
+        Vec2f punctFinal = puncteTraseu.back();
+        sf::CircleShape gaura(25.f);
+        gaura.setFillColor(sf::Color::Black);
+        gaura.setOutlineColor(sf::Color::Red);
+        gaura.setOutlineThickness(3.0f);
+        gaura.setOrigin({25.f, 25.f});
+        gaura.setPosition({punctFinal.x, punctFinal.y});
+        window.draw(gaura);
+
+        sf::VertexArray linieTraseu(sf::PrimitiveType::LineStrip, puncteTraseu.size());
+        for (size_t i = 0; i < puncteTraseu.size(); ++i) {
+            linieTraseu[i].position = sf::Vector2f(puncteTraseu[i].x, puncteTraseu[i].y);
+            linieTraseu[i].color = sf::Color(200, 200, 200, 100);
+        }
+        window.draw(linieTraseu);
+    }
+
     for (const auto& bilaCore : nivel.getSirDeBile()) {
         sf::CircleShape formaBila(bilaCore.getRaza());
         sf::Color c = getSfmlColor(bilaCore.getCuloare());
