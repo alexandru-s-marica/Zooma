@@ -78,7 +78,7 @@ int main() {
                                 nivel.getProiector().schimbaBila();
                             }
                         }
-                    } else if (nivel.getStareJoc() == StareJoc::GAME_OVER) {
+                    } else if (nivel.esteTerminat()) {
                         if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
                             if (key->code == sf::Keyboard::Key::R) nivel.reset();
                         }
@@ -119,7 +119,6 @@ int main() {
             }
             else if (stareAplicatie == AppState::JOC) {
                 nivel.ruleazaFrame(deltaTime);
-
                 renderer.actualizeazaStareUI();
                 renderer.draw();
             }

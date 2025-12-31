@@ -23,12 +23,11 @@ GameRenderer::GameRenderer(sf::RenderWindow& win, Nivel& n)
         std::cerr << "[GameRenderer] EROARE: Nu s-a putut incarca arial.ttf\n";
     }
 
-    textNivel.setCharacterSize(24);
+    textNivel.setCharacterSize(20);
     textNivel.setFillColor(sf::Color::White);
     textNivel.setOutlineColor(sf::Color::Black);
     textNivel.setOutlineThickness(1.0f);
-    textNivel.setPosition({20.f, 20.f});
-    textNivel.setString("Nivel: 1");
+    textNivel.setPosition({10.f, 10.f});
 }
 
 void GameRenderer::actualizeazaStareUI() {
@@ -147,7 +146,10 @@ void GameRenderer::draw() {
         window.draw(formaProiectil);
     }
 
-    textNivel.setString("Nivel: " + std::to_string(nivel.getNivelCurent()));
+    std::string stats = "Nivel: " + std::to_string(nivel.getNivelCurent()) +
+                        "\nScor: " + std::to_string(nivel.getScor()) +
+                        "\nTotal Distruse: " + std::to_string(Bila::getBileDistruseTotal());
+    textNivel.setString(stats);
     window.draw(textNivel);
 
     mesajManager.draw(window);
