@@ -4,7 +4,7 @@
 
 Meniu::Meniu(float width, float height, const std::string& titluMeniu, const std::vector<std::string>& optiuniText)
     : titlu(ResourceManager::getInstance().getFont()),
-      indexSelectat(-1), fontIncarcat(true)
+      indexSelectat(-1)
 {
     const sf::Font& fontRef = ResourceManager::getInstance().getFont();
 

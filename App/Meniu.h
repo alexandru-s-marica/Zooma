@@ -12,8 +12,7 @@ private:
 
 public:
     ButonMeniu(float x, float y, float w, float h, const std::string& label, const sf::Font& font)
-        : text(font),
-          isHovered(false), isSelected(false)
+        : text(font), isHovered(false), isSelected(false)
     {
         shape.setPosition({x, y});
         shape.setSize({w, h});
@@ -51,7 +50,6 @@ private:
     std::vector<ButonMeniu> butoane;
     sf::Text titlu;
     int indexSelectat;
-    bool fontIncarcat;
 
 public:
     Meniu(float width, float height, const std::string& titluMeniu, const std::vector<std::string>& optiuniText);
