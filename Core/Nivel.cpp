@@ -20,7 +20,6 @@ void Nivel::genereazaTraseu(int nivel) {
     Vec2f pozProiector = {400.f, 500.f};
 
     if (nivel == 1) {
-        pozProiector = {400.f, 500.f};
         for (int i = 0; i < 200; ++i) traseu.push_back({100.f + i * 3, 100.f});
         for (int i = 0; i < 150; ++i) traseu.push_back({700.f, 100.f + i * 2});
         for (int i = 0; i < 200; ++i) traseu.push_back({700.f - i * 3, 400.f});

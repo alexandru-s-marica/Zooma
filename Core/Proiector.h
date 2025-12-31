@@ -12,7 +12,7 @@ private:
     void genereazaBilaUrmatoare(const std::vector<Culoare>& culoriDisponibile);
 
 public:
-    Proiector(Vec2f pos);
+    explicit Proiector(Vec2f pos);
 
     void rotesteSpre(Vec2f tinta);
     Bila trage(const std::vector<Culoare>& culoriDisponibile);
