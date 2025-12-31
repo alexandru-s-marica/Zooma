@@ -2,6 +2,8 @@
 
 Un joc de strategie rapid, de tip bubble-shooter, inspirat din Zuma, implementat în C++ folosind biblioteca grafică SFML (versiunea 3.0). Această versiune pune accent pe o arhitectură robustă Orientată pe Obiecte și pe gestionarea eficientă a memoriei.
 
+! Versiunea v0.5.1 include toate cerințele din tema 2
+
 ## Funcționalități Gameplay
 
 * **Fizică Avansată a Șarpelui:**
@@ -23,7 +25,7 @@ Un joc de strategie rapid, de tip bubble-shooter, inspirat din Zuma, implementat
     * Detectarea și eliminarea potrivirilor de 3+ bile (Match-3).
     * Condiții de victorie (șir gol) și înfrângere (șirul ajunge la final).
 
-## Concepte Tehnice Implementate (OOP & C++)
+## Concepte Tehnice Implementate (POO & C++)
 
 Proiectul demonstrează utilizarea conceptelor avansate de C++ și OOP:
 

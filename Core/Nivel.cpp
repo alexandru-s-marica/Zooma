@@ -3,7 +3,15 @@
 #include <iostream>
 #include <algorithm>
 
-const float VITEZA_SARPE = 70.0f;
+// Viteza creste cu nivelul
+float calculeazaVitezaNivel(int nivel) {
+    return 60.0f + (nivel - 1) * 30.0f;
+}
+
+float calculeazaDistantaBile(int nivel) {
+    (void)nivel;
+    return 40.0f;
+}
 
 void Nivel::genereazaTraseu() {
     traseu.clear();
@@ -18,46 +26,55 @@ Nivel::Nivel()
       proiector({SCREEN_WIDTH / 2.f, SCREEN_HEIGHT - 100.f}),
       scor(0),
       stare(StareJoc::RULEAZA),
+      nivelCurent(1),
       modAccuracyActiv(false),
       timpRamasAccuracy(0.0f),
       esteInghetat(false),
       timpRamasInghet(0.0f)
 {
-    std::cout << "Nivel: Constructor default\n";
     genereazaTraseu();
+    incarcaNivel(1);
 }
 
-Nivel::Nivel(float initialBallSpacing)
-    : proiector({SCREEN_WIDTH / 2.f, SCREEN_HEIGHT - 100.f}),
-      scor(0),
-      stare(StareJoc::RULEAZA),
-      modAccuracyActiv(false),
-      timpRamasAccuracy(0.0f),
-      esteInghetat(false),
-      timpRamasInghet(0.0f)
-{
-    std::cout << "Nivel: Constructor parametri\n";
-    genereazaTraseu();
-    sirBile = SirDeBile(traseu, VITEZA_SARPE, initialBallSpacing);
+void Nivel::incarcaNivel(int numarNivel) {
+    nivelCurent = numarNivel;
+    reset();
+    std::cout << "--- INCARCARE NIVEL " << nivelCurent << " ---\n";
+}
+
+void Nivel::reset() {
+    stare = StareJoc::RULEAZA;
+    modAccuracyActiv = false;
+    timpRamasAccuracy = 0.0f;
+    esteInghetat = false;
+    timpRamasInghet = 0.0f;
+
+    proiectileInZbor.clear();
+    exploziiVizuale.clear();
+
+    proiector = Proiector({SCREEN_WIDTH / 2.f, SCREEN_HEIGHT - 100.f});
+
+    // Configurare SirDeBile in functie de nivel
+    float viteza = calculeazaVitezaNivel(nivelCurent);
+    float distanta = calculeazaDistantaBile(nivelCurent);
+
+    sirBile = SirDeBile(traseu, viteza, distanta);
 
     std::vector<Culoare> culori = sirBile.getCuloriActive();
-    if (!culori.empty()) {
-        proiector.valideazaCulori(culori);
-    }
+    if (!culori.empty()) proiector.valideazaCulori(culori);
 }
 
 void Nivel::ruleazaFrame(float deltaTime) {
     if (stare != StareJoc::RULEAZA) return;
 
     float timeStepBile = deltaTime;
-
     if (esteInghetat) {
         timpRamasInghet -= deltaTime;
         if (timpRamasInghet <= 0.f) {
             esteInghetat = false;
-            std::cout << "[Nivel] INGHET DEZACTIVAT\n";
+            std::cout << "INGHET DEZACTIVAT\n";
         } else {
-            timeStepBile = 0.0f; // STOP
+            timeStepBile = 0.0f;
         }
     }
 
@@ -70,10 +87,7 @@ void Nivel::ruleazaFrame(float deltaTime) {
 
     if (modAccuracyActiv) {
         timpRamasAccuracy -= deltaTime;
-        if (timpRamasAccuracy <= 0.f) {
-            modAccuracyActiv = false;
-            std::cout << "Mod Accuracy dezactivat.\n";
-        }
+        if (timpRamasAccuracy <= 0.f) modAccuracyActiv = false;
     }
 
     for (auto it = exploziiVizuale.begin(); it != exploziiVizuale.end(); ) {
@@ -95,11 +109,9 @@ void Nivel::ruleazaFrame(float deltaTime) {
     gestioneazaColiziuni();
 
     if (sirBile.aAtingJucatorulSfarsitul()) {
-        std::cout << "GAME OVER!\n";
         stare = StareJoc::GAME_OVER;
     }
     else if (sirBile.getBile().empty() && stare == StareJoc::RULEAZA) {
-        std::cout << "VICTORIE!\n";
         stare = StareJoc::CASTIGAT;
     }
 }
@@ -135,28 +147,8 @@ bool Nivel::esteTerminat() const { return stare == StareJoc::GAME_OVER; }
 bool Nivel::esteCastigat() const { return stare == StareJoc::CASTIGAT; }
 
 std::ostream& operator<<(std::ostream& os, const Nivel& n) {
-    os << "Nivel (Scor: " << n.scor << ")\n";
+    os << "Nivel " << n.nivelCurent << " (Scor: " << n.scor << ")\n";
     return os;
-}
-
-void Nivel::reset(float initialBallSpacing) {
-    scor = 0;
-    stare = StareJoc::RULEAZA;
-    modAccuracyActiv = false;
-    timpRamasAccuracy = 0.0f;
-    esteInghetat = false;
-    timpRamasInghet = 0.0f;
-
-    proiectileInZbor.clear();
-    exploziiVizuale.clear();
-
-    proiector = Proiector({SCREEN_WIDTH / 2.f, SCREEN_HEIGHT - 100.f});
-    traseu.clear();
-    genereazaTraseu();
-    sirBile = SirDeBile(traseu, VITEZA_SARPE, initialBallSpacing);
-
-    std::vector<Culoare> culori = sirBile.getCuloriActive();
-    if (!culori.empty()) proiector.valideazaCulori(culori);
 }
 
 Bila Nivel::trageBilaJucator() {
@@ -165,24 +157,10 @@ Bila Nivel::trageBilaJucator() {
 }
 
 void Nivel::activeazaExplozieLa(Vec2f pozitie) {
-    std::cout << "BOOM! Explozie la " << pozitie << "\n";
     sirBile.explodeazaZona(pozitie, 250.0f);
     exploziiVizuale.push_back({pozitie, 250.0f, 1.0f});
 }
 
-void Nivel::activeazaRetro() {
-    std::cout << "RETRO ACTIVAT!\n";
-    sirBile.aplicaRetro(300.0f);
-}
-
-void Nivel::activeazaModAccuracy(float durata) {
-    std::cout << "ACCURACY ACTIVAT!\n";
-    modAccuracyActiv = true;
-    timpRamasAccuracy = durata;
-}
-
-void Nivel::activeazaInghet(float durata) {
-    std::cout << "INGHET ACTIVAT TIMP DE " << durata << " SECUNDE\n";
-    esteInghetat = true;
-    timpRamasInghet = durata;
-}
+void Nivel::activeazaRetro() { sirBile.aplicaRetro(300.0f); }
+void Nivel::activeazaModAccuracy(float durata) { modAccuracyActiv = true; timpRamasAccuracy = durata; }
+void Nivel::activeazaInghet(float durata) { esteInghetat = true; timpRamasInghet = durata; }

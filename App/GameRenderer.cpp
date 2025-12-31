@@ -1,7 +1,7 @@
 #include "GameRenderer.h"
 #include <cmath>
 #include <variant>
-#include <cstdint>
+#include <iostream>
 
 sf::Color getSfmlColor(Culoare c) {
     switch (c) {
@@ -17,51 +17,18 @@ sf::Color getSfmlColor(Culoare c) {
 }
 
 GameRenderer::GameRenderer(sf::RenderWindow& win, Nivel& n)
-    : window(win), nivel(n) {
-}
-
-void GameRenderer::handleInput() {
-    while (auto event = window.pollEvent()) {
-        if (event->is<sf::Event::Closed>()) {
-            window.close();
-        }
-
-        if (auto keyPress = event->getIf<sf::Event::KeyPressed>()) {
-            if (keyPress->code == sf::Keyboard::Key::R) {
-                nivel.reset(40.f);
-                actualizeazaStareUI();
-            }
-        }
-
-        if (nivel.getStareJoc() != StareJoc::RULEAZA) {
-            continue;
-        }
-
-        if (auto mouseMove = event->getIf<sf::Event::MouseMoved>()) {
-            nivel.getProiector().rotesteSpre({
-                static_cast<float>(mouseMove->position.x),
-                static_cast<float>(mouseMove->position.y)
-            });
-        }
-        else if (auto mousePress = event->getIf<sf::Event::MouseButtonPressed>()) {
-            if (mousePress->button == sf::Mouse::Button::Left) {
-                Bila proiectil = nivel.trageBilaJucator();
-
-                Vec2f mousePos = {
-                    static_cast<float>(mousePress->position.x),
-                    static_cast<float>(mousePress->position.y)
-                };
-
-                Vec2f dir = mousePos - nivel.getProiector().getPozitie();
-                dir = dir.normalize();
-
-                nivel.adaugaProiectil(proiectil, dir);
-            }
-            if (mousePress->button == sf::Mouse::Button::Right) {
-                nivel.getProiector().schimbaBila();
-            }
-        }
+    : window(win), nivel(n), font(), textNivel(font)
+{
+    if (!font.openFromFile("arial.ttf")) {
+        std::cerr << "[GameRenderer] EROARE: Nu s-a putut incarca arial.ttf\n";
     }
+
+    textNivel.setCharacterSize(24);
+    textNivel.setFillColor(sf::Color::White);
+    textNivel.setOutlineColor(sf::Color::Black);
+    textNivel.setOutlineThickness(1.0f);
+    textNivel.setPosition({20.f, 20.f});
+    textNivel.setString("Nivel: 1");
 }
 
 void GameRenderer::actualizeazaStareUI() {
@@ -71,7 +38,7 @@ void GameRenderer::actualizeazaStareUI() {
         mesajManager.afiseaza("GAME OVER\nApasa 'R' pentru Restart", {600.f, 400.f});
     }
     else if (nivel.esteCastigat()) {
-        mesajManager.afiseaza("VICTORIE!\nApasa 'R' pentru Restart", {600.f, 400.f});
+        mesajManager.afiseaza("VICTORIE!\nApasa 'N' pentru Nivelul Urmator", {600.f, 400.f});
     }
     else {
         mesajManager.ascunde();
@@ -79,8 +46,6 @@ void GameRenderer::actualizeazaStareUI() {
 }
 
 void GameRenderer::draw() {
-    window.clear(sf::Color(20, 20, 40));
-
     for (const auto& bilaCore : nivel.getSirDeBile()) {
         sf::CircleShape formaBila(bilaCore.getRaza());
         sf::Color c = getSfmlColor(bilaCore.getCuloare());
@@ -89,7 +54,6 @@ void GameRenderer::draw() {
             c.a = 100;
             formaBila.setScale({0.8f, 0.8f});
         } else {
-            // APLICARE ANIMATIE POP-IN
             float s = bilaCore.getScaleVisual();
             formaBila.setScale({s, s});
         }
@@ -135,7 +99,6 @@ void GameRenderer::draw() {
 
     if (nivel.esteAccuracyActiv()) {
         Vec2f posProiector = nivel.getProiector().getPozitie();
-
         sf::Vector2i mousePixel = sf::Mouse::getPosition(window);
         sf::Vector2f mouseWorld = window.mapPixelToCoords(mousePixel);
 
@@ -143,7 +106,6 @@ void GameRenderer::draw() {
             sf::Vertex{sf::Vector2f(posProiector.x, posProiector.y), sf::Color::Red},
             sf::Vertex{mouseWorld, sf::Color::Red}
         };
-
         window.draw(linie, 2, sf::PrimitiveType::Lines);
     }
 
@@ -185,6 +147,8 @@ void GameRenderer::draw() {
         window.draw(formaProiectil);
     }
 
+    textNivel.setString("Nivel: " + std::to_string(nivel.getNivelCurent()));
+    window.draw(textNivel);
+
     mesajManager.draw(window);
-    window.display();
 }

@@ -34,7 +34,6 @@ SirDeBile::SirDeBile(std::vector<Vec2f> traseu, float viteza, float distanta)
             20.f,
             progresCurent
         );
-        Bila& b = bile.back();
         progresCurent -= distantaIntreBile;
     }
 }
@@ -86,7 +85,6 @@ void SirDeBile::verificaExplozieLant(std::list<Bila>::iterator stanga, std::list
     }
 }
 
-// Helper pentru numarat bile
 int numaraBileAdiacente(std::list<Bila>& lista, std::list<Bila>::iterator startIt, bool spreCoada) {
     if (startIt == lista.end()) return 0;
     Culoare c = startIt->getCuloare();
@@ -142,7 +140,7 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
             it->setPozitie(getPozitiePeTraseu(it->getProgres()));
         }
 
-        auto prev_it = it; // Bila din spate
+        auto prev_it = it;
         ++it;
 
         while (it != bile.rend()) {
@@ -152,6 +150,7 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
             float ideal = distantaIntreBile;
 
             if (dist <= ideal + 0.5f) {
+                // CONTACT: Se imping
                 float newP = prev_it->getProgres() + ideal;
                 it->setProgres(newP);
                 it->setPozitie(getPozitiePeTraseu(newP));

@@ -69,6 +69,9 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         Core/Efecte.h
         Core/Efecte.cpp
         Core/Exceptions.h
+        App/Meniu.h
+        App/Meniu.cpp
+
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

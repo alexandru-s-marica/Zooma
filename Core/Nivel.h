@@ -20,15 +20,15 @@ private:
     Proiector proiector;
     std::vector<Vec2f> traseu;
     std::list<std::pair<Bila, Vec2f>> proiectileInZbor;
-
     std::vector<AnimatieExplozie> exploziiVizuale;
 
     int scor;
     StareJoc stare;
 
+    int nivelCurent;
+
     bool modAccuracyActiv;
     float timpRamasAccuracy;
-
     bool esteInghetat;
     float timpRamasInghet;
 
@@ -37,9 +37,12 @@ private:
 
 public:
     Nivel();
-    explicit Nivel(float initialBallSpacing);
 
-    void reset(float initialBallSpacing);
+    // Initializare specifica unui nivel
+    void incarcaNivel(int numarNivel);
+
+    void reset();
+
     void ruleazaFrame(float deltaTime);
     void adaugaProiectil(const Bila& p, const Vec2f& dir);
     Bila trageBilaJucator();
@@ -48,18 +51,20 @@ public:
     Proiector& getProiector();
     const Proiector& getProiector() const;
     const std::list<std::pair<Bila, Vec2f>>& getProiectileInZbor() const;
+
     int getScor() const;
+    int getNivelCurent() const { return nivelCurent; }
+
     StareJoc getStareJoc() const;
     bool esteTerminat() const;
     bool esteCastigat() const;
-    bool esteAccuracyActiv() const { return modAccuracyActiv; }
 
+    bool esteAccuracyActiv() const { return modAccuracyActiv; }
     const std::vector<AnimatieExplozie>& getExploziiVizuale() const { return exploziiVizuale; }
 
     void activeazaExplozieLa(Vec2f pozitie);
     void activeazaRetro();
     void activeazaModAccuracy(float durata);
-
     void activeazaInghet(float durata);
 
     friend std::ostream& operator<<(std::ostream& os, const Nivel& n);
