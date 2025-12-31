@@ -6,27 +6,24 @@ class ZoomaException : public std::exception {
 protected:
     std::string mesaj;
 public:
-    explicit ZoomaException(const std::string& msg) : mesaj(msg) {}
-
-    const char* what() const noexcept override {
-        return mesaj.c_str();
-    }
+    explicit ZoomaException(const std::string& m) : mesaj(m) {}
+    const char* what() const noexcept override { return mesaj.c_str(); }
 };
 
 class ResursaLipsaException : public ZoomaException {
 public:
-    explicit ResursaLipsaException(const std::string& numeResursa)
-        : ZoomaException("EROARE CRITICA RESURSA LIPSA: " + numeResursa) {}
+    explicit ResursaLipsaException(const std::string& nume)
+        : ZoomaException("CRITIC: Resursa lipsa -> " + nume) {}
+};
+
+class FisierCoruptException : public ZoomaException {
+public:
+    explicit FisierCoruptException(const std::string& detalii)
+        : ZoomaException("WARN: Fisier corupt sau inaccesibil -> " + detalii) {}
 };
 
 class LogicaJocException : public ZoomaException {
 public:
-    explicit LogicaJocException(const std::string& detaliu)
-        : ZoomaException("EROARE LOGICA: " + detaliu) {}
-};
-
-class InitializareEsuataException : public ZoomaException {
-public:
-    explicit InitializareEsuataException(const std::string& componenta)
-        : ZoomaException("INIT FAIL - NU S-A PUTUT INITIALIZA: " + componenta) {}
+    explicit LogicaJocException(const std::string& detalii)
+        : ZoomaException("LOGIC: Stare invalida -> " + detalii) {}
 };

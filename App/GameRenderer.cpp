@@ -1,4 +1,5 @@
 #include "GameRenderer.h"
+#include "../Core/ResourceManager.h"
 #include <cmath>
 #include <variant>
 #include <iostream>
@@ -17,27 +18,26 @@ sf::Color getSfmlColor(Culoare c) {
 }
 
 GameRenderer::GameRenderer(sf::RenderWindow& win, Nivel& n)
-    : window(win), nivel(n), font(), textNivel(font)
+    : window(win), nivel(n), font(),
+      textNivel(ResourceManager::getInstance().getFont()) // <--- FIX AICI
 {
-    if (!font.openFromFile("arial.ttf")) {
-        std::cerr << "[GameRenderer] EROARE: Nu s-a putut incarca arial.ttf\n";
-    }
-
-    textNivel.setCharacterSize(20);
+    textNivel.setCharacterSize(24);
     textNivel.setFillColor(sf::Color::White);
     textNivel.setOutlineColor(sf::Color::Black);
     textNivel.setOutlineThickness(1.0f);
-    textNivel.setPosition({10.f, 10.f});
+    textNivel.setPosition({850.f, 50.f});
 }
 
 void GameRenderer::actualizeazaStareUI() {
     StareJoc stare = nivel.getStareJoc();
+    float centerX = window.getSize().x / 2.0f;
+    float centerY = window.getSize().y / 2.0f;
 
     if (stare == StareJoc::GAME_OVER) {
-        mesajManager.afiseaza("GAME OVER\nApasa 'R' pentru Restart", {600.f, 400.f});
+        mesajManager.afiseaza("GAME OVER\nApasa 'R' pentru Restart", {centerX, centerY});
     }
     else if (nivel.esteCastigat()) {
-        mesajManager.afiseaza("VICTORIE!\nApasa 'N' pentru Nivelul Urmator", {600.f, 400.f});
+        mesajManager.afiseaza("VICTORIE!\nApasa 'N' pentru Nivelul Urmator", {centerX, centerY});
     }
     else {
         mesajManager.ascunde();
@@ -45,6 +45,13 @@ void GameRenderer::actualizeazaStareUI() {
 }
 
 void GameRenderer::draw() {
+    sf::RectangleShape sidePanel({400.f, 800.f});
+    sidePanel.setPosition({800.f, 0.f});
+    sidePanel.setFillColor(sf::Color(30, 30, 50));
+    sidePanel.setOutlineColor(sf::Color::White);
+    sidePanel.setOutlineThickness(-2.0f);
+    window.draw(sidePanel);
+
     const std::vector<Vec2f>& puncteTraseu = nivel.getTraseu();
 
     if (!puncteTraseu.empty()) {
@@ -121,6 +128,8 @@ void GameRenderer::draw() {
         sf::Vector2i mousePixel = sf::Mouse::getPosition(window);
         sf::Vector2f mouseWorld = window.mapPixelToCoords(mousePixel);
 
+        if (mouseWorld.x > 800.f) mouseWorld.x = 800.f;
+
         sf::Vertex linie[] = {
             sf::Vertex{sf::Vector2f(posProiector.x, posProiector.y), sf::Color::Red},
             sf::Vertex{mouseWorld, sf::Color::Red}
@@ -167,8 +176,9 @@ void GameRenderer::draw() {
     }
 
     std::string stats = "Nivel: " + std::to_string(nivel.getNivelCurent()) +
-                        "\nScor: " + std::to_string(nivel.getScor()) +
-                        "\nTotal Distruse: " + std::to_string(Bila::getBileDistruseTotal());
+                        "\n\nScor: " + std::to_string(nivel.getScor()) +
+                        "\n\nHigh Score: " + std::to_string(nivel.getHighScore()) +
+                        "\n\nTotal Distruse: " + std::to_string(Bila::getBileDistruseTotal());
     textNivel.setString(stats);
     window.draw(textNivel);
 

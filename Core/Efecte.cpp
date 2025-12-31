@@ -1,21 +1,31 @@
 #include "Efecte.h"
 #include "Nivel.h"
+#include <iostream>
 
-void EfectExplozie::doAplica(Nivel& nivel, Vec2f pozitie) {
-    nivel.activeazaExplozieLa(pozitie);
+void EfectBila::activeazaEfect(Nivel& nivel) {
+    doAplica(nivel);
 }
 
-void EfectRetro::doAplica(Nivel& nivel, Vec2f pozitie) {
-    (void)pozitie;
+void EfectExplozie::doAplica(Nivel& nivel) {
+    (void)nivel;
+}
+
+std::unique_ptr<EfectBila> EfectExplozie::clone() const {
+    return std::make_unique<EfectExplozie>(*this);
+}
+
+void EfectRetro::doAplica(Nivel& nivel) {
     nivel.activeazaRetro();
 }
 
-void EfectAccuracy::doAplica(Nivel& nivel, Vec2f pozitie) {
-    (void)pozitie;
-    nivel.activeazaModAccuracy(5.0f);
+std::unique_ptr<EfectBila> EfectRetro::clone() const {
+    return std::make_unique<EfectRetro>(*this);
 }
 
-void EfectInghet::doAplica(Nivel& nivel, Vec2f pozitie) {
-    (void)pozitie;
-    nivel.activeazaInghet(3.0f);
+void EfectAccuracy::doAplica(Nivel& nivel) {
+    nivel.activeazaModAccuracy(10.0f);
+}
+
+std::unique_ptr<EfectBila> EfectAccuracy::clone() const {
+    return std::make_unique<EfectAccuracy>(*this);
 }

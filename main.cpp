@@ -4,11 +4,13 @@
 #include "App/Meniu.h"
 #include "Core/Nivel.h"
 #include "Core/Exceptions.h"
+#include "Core/ResourceManager.h"
 
 enum class AppState { MENIU_PRINCIPAL, JOC, PAUZA };
 
 int main() {
     try {
+        ResourceManager::getInstance().incarcaFont("arial.ttf");
         sf::RenderWindow window(sf::VideoMode({SCREEN_WIDTH, SCREEN_HEIGHT}), "Zooma v0.5.0");
         window.setFramerateLimit(60);
 
@@ -20,13 +22,11 @@ int main() {
 
         Nivel nivel;
         GameRenderer renderer(window, nivel);
-
         AppState stareAplicatie = AppState::MENIU_PRINCIPAL;
         sf::Clock clock;
 
         while (window.isOpen()) {
             float deltaTime = clock.restart().asSeconds();
-
             while (const auto event = window.pollEvent()) {
                 if (event->is<sf::Event::Closed>()) window.close();
 
@@ -40,9 +40,7 @@ int main() {
                             if (opt == 1) window.close();
                         }
                     }
-                    if (const auto* mouseMove = event->getIf<sf::Event::MouseMoved>()) {
-                        meniuPrincipal.updateMouse(window.mapPixelToCoords(mouseMove->position));
-                    }
+                    if (const auto* mouseMove = event->getIf<sf::Event::MouseMoved>()) meniuPrincipal.updateMouse(window.mapPixelToCoords(mouseMove->position));
                     if (const auto* mousePress = event->getIf<sf::Event::MouseButtonPressed>()) {
                         if (mousePress->button == sf::Mouse::Button::Left) {
                             int opt = meniuPrincipal.getOptiuneLaClick(window.mapPixelToCoords(mousePress->position));
@@ -54,15 +52,12 @@ int main() {
                 else if (stareAplicatie == AppState::JOC) {
                     if (const auto* keyEvent = event->getIf<sf::Event::KeyPressed>()) {
                         if (keyEvent->code == sf::Keyboard::Key::Escape) stareAplicatie = AppState::PAUZA;
-
-                        if (nivel.esteCastigat() && keyEvent->code == sf::Keyboard::Key::N) {
-                            nivel.incarcaNivel(nivel.getNivelCurent() + 1);
-                        }
+                        if (nivel.esteCastigat() && keyEvent->code == sf::Keyboard::Key::N) nivel.incarcaNivel(nivel.getNivelCurent() + 1);
                     }
-
                     if (nivel.getStareJoc() == StareJoc::RULEAZA) {
                         if (const auto* mouseMove = event->getIf<sf::Event::MouseMoved>()) {
                             sf::Vector2f mPos = window.mapPixelToCoords(mouseMove->position);
+                            if(mPos.x > 800) mPos.x = 800;
                             nivel.getProiector().rotesteSpre({mPos.x, mPos.y});
                         }
                         else if (const auto* mousePress = event->getIf<sf::Event::MouseButtonPressed>()) {
@@ -70,18 +65,14 @@ int main() {
                                 Bila p = nivel.trageBilaJucator();
                                 sf::Vector2f mPosSf = window.mapPixelToCoords(mousePress->position);
                                 Vec2f mPos = { mPosSf.x, mPosSf.y };
-
+                                if(mPos.x > 800) mPos.x = 800;
                                 Vec2f dir = mPos - nivel.getProiector().getPozitie();
                                 nivel.adaugaProiectil(p, dir.normalize());
                             }
-                            if (mousePress->button == sf::Mouse::Button::Right) {
-                                nivel.getProiector().schimbaBila();
-                            }
+                            if (mousePress->button == sf::Mouse::Button::Right) nivel.getProiector().schimbaBila();
                         }
                     } else if (nivel.esteTerminat()) {
-                        if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
-                            if (key->code == sf::Keyboard::Key::R) nivel.reset();
-                        }
+                        if (const auto* key = event->getIf<sf::Event::KeyPressed>()) if (key->code == sf::Keyboard::Key::R) nivel.reset();
                     }
                 }
                 else if (stareAplicatie == AppState::PAUZA) {
@@ -97,9 +88,7 @@ int main() {
                             if (opt == 3) window.close();
                         }
                     }
-                    if (const auto* mouseMove = event->getIf<sf::Event::MouseMoved>()) {
-                        meniuPauza.updateMouse(window.mapPixelToCoords(mouseMove->position));
-                    }
+                    if (const auto* mouseMove = event->getIf<sf::Event::MouseMoved>()) meniuPauza.updateMouse(window.mapPixelToCoords(mouseMove->position));
                     if (const auto* mousePress = event->getIf<sf::Event::MouseButtonPressed>()) {
                         if (mousePress->button == sf::Mouse::Button::Left) {
                             int opt = meniuPauza.getOptiuneLaClick(window.mapPixelToCoords(mousePress->position));
@@ -111,28 +100,14 @@ int main() {
                     }
                 }
             }
-
             window.clear(sf::Color(20, 20, 40));
-
-            if (stareAplicatie == AppState::MENIU_PRINCIPAL) {
-                meniuPrincipal.deseneaza(window);
-            }
-            else if (stareAplicatie == AppState::JOC) {
-                nivel.ruleazaFrame(deltaTime);
-                renderer.actualizeazaStareUI();
-                renderer.draw();
-            }
-            else if (stareAplicatie == AppState::PAUZA) {
-                renderer.draw();
-                meniuPauza.deseneaza(window);
-            }
-
+            if (stareAplicatie == AppState::MENIU_PRINCIPAL) meniuPrincipal.deseneaza(window);
+            else if (stareAplicatie == AppState::JOC) { nivel.ruleazaFrame(deltaTime); renderer.actualizeazaStareUI(); renderer.draw(); }
+            else if (stareAplicatie == AppState::PAUZA) { renderer.draw(); meniuPauza.deseneaza(window); }
             window.display();
         }
     }
-    catch (const std::exception& e) {
-        std::cerr << "CRITICAL ERROR: " << e.what() << std::endl;
-        return -1;
-    }
+    catch (const ZoomaException& e) { std::cerr << "[ZOOMA EXCEPTION] " << e.what() << std::endl; return -1; }
+    catch (const std::exception& e) { std::cerr << "[STD EXCEPTION] " << e.what() << std::endl; return -1; }
     return 0;
 }

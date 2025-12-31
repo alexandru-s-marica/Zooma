@@ -10,52 +10,47 @@ private:
     Culoare culoare;
     Vec2f pozitie;
     float raza;
-    bool seDistruge;
-    float timpPanaLaMoarte;
-
     float progresPeTraseu;
-    float timerViataEfect;
 
-    float scaleVisual;
+    bool inDistrugere;
+    bool gataDeSters;
 
     std::unique_ptr<EfectBila> efect;
     static int bileDistruseTotal;
 
 public:
-    Bila(Culoare c, Vec2f pos, float r, float progres = 0.0f);
-    Bila(Culoare c, Vec2f pos, float r, float progres, std::unique_ptr<EfectBila> efectInitial);
+    Bila();
+    Bila(Culoare c, Vec2f pos, float r, float progres = 0.f);
+
 
     Bila(const Bila& other);
-    Bila& operator=(Bila other);
-    friend void swap(Bila& first, Bila& second) noexcept;
+
+    Bila& operator=(const Bila& other);
+
     ~Bila();
 
-    void setPozitie(Vec2f pos);
-    Vec2f getPozitie() const;
-    void setProgres(float p);
-    float getProgres() const;
-    void avanseaza(float deltaDistanta);
+    void actualizeaza(float deltaTime);
+    void activeazaEfect(Nivel& nivel);
+    void adaugaEfect(std::unique_ptr<EfectBila> e);
 
+    bool areEfect() const;
     Culoare getCuloare() const;
+    Vec2f getPozitie() const;
     float getRaza() const;
+    float getProgres() const;
 
-    // Getter pentru animatie
-    float getScaleVisual() const { return scaleVisual; }
+    bool esteInDistrugere() const;
+    bool eGataDeSters() const;
 
     Bounds getBounds() const;
 
+    void setPozitie(Vec2f p);
+    void setProgres(float p);
     void marcheazaPentruDistrugere();
-    bool esteInDistrugere() const;
-    void actualizeaza(float deltaTime);
-    bool eGataDeSters() const;
+    void avanseaza(float distanta);
 
-    void activeazaEfect(Nivel& nivel);
-    bool areEfect() const;
-    void stergeEfect();
-    void adaugaEfect(std::unique_ptr<EfectBila> efectNou);
-
-    static void incrementeazaBileDistruse();
     static int getBileDistruseTotal();
+    static void incrementeazaBileDistruse();
 
-    friend std::ostream& operator<<(std::ostream& os, const Bila& b);
+    float getScaleVisual() const;
 };

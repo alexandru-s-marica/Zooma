@@ -10,8 +10,7 @@
 
 SirDeBile::SirDeBile()
     : viteza(0.f), distantaIntreBile(0.f), lungimeTotalaTraseu(0.f),
-      distantaRetroRamasa(0.f), timerGenerareEfectRandom(0.f) {
-}
+      distantaRetroRamasa(0.f), timerGenerareEfectRandom(0.f) {}
 
 SirDeBile::SirDeBile(std::vector<Vec2f> traseu, float viteza, float distanta)
     : traseu(std::move(traseu)), viteza(viteza), distantaIntreBile(distanta), lungimeTotalaTraseu(0.f),
@@ -20,20 +19,12 @@ SirDeBile::SirDeBile(std::vector<Vec2f> traseu, float viteza, float distanta)
     for (size_t i = 0; i < this->traseu.size() - 1; ++i) {
         lungimeTotalaTraseu += (this->traseu[i+1] - this->traseu[i]).magnitude();
     }
-
     const int NUMAR_BILE_INITIALE = 10;
     float progresCurent = (NUMAR_BILE_INITIALE - 1) * distantaIntreBile;
-
     static std::mt19937 generator(static_cast<unsigned int>(std::time(nullptr)));
     std::uniform_int_distribution<int> distCuloare(0, 4);
-
     for (int i = 0; i < NUMAR_BILE_INITIALE; ++i) {
-        bile.emplace_back(
-            static_cast<Culoare>(distCuloare(generator)),
-            getPozitiePeTraseu(progresCurent),
-            20.f,
-            progresCurent
-        );
+        bile.emplace_back(static_cast<Culoare>(distCuloare(generator)), getPozitiePeTraseu(progresCurent), 20.f, progresCurent);
         progresCurent -= distantaIntreBile;
     }
 }
@@ -42,7 +33,6 @@ Vec2f SirDeBile::getPozitiePeTraseu(float progres) const {
     if (traseu.empty() || lungimeTotalaTraseu == 0.f) return {0.f, 0.f};
     if (progres < 0) progres = 0;
     if (progres > lungimeTotalaTraseu) progres = lungimeTotalaTraseu;
-
     float distantaCurenta = 0;
     for (size_t i = 0; i < traseu.size() - 1; ++i) {
         float lungimeSegment = (traseu[i+1] - traseu[i]).magnitude();
@@ -67,7 +57,6 @@ void SirDeBile::verificaExplozieLant(std::list<Bila>::iterator stanga, std::list
     if (bile.empty() || stanga == bile.end() || dreapta == bile.end()) return;
     if (stanga->esteInDistrugere() || dreapta->esteInDistrugere()) return;
     if (stanga->getCuloare() != dreapta->getCuloare()) return;
-
     Culoare culoareTinta = stanga->getCuloare();
     auto it_start = stanga;
     auto it_end = dreapta; it_end++;
@@ -85,7 +74,6 @@ void SirDeBile::verificaExplozieLant(std::list<Bila>::iterator stanga, std::list
     }
 }
 
-// FIX CPPCHECK: Parameter 'lista' declared as reference to const, iterator changed to const_iterator
 int numaraBileAdiacente(const std::list<Bila>& lista, std::list<Bila>::const_iterator startIt, bool spreCoada) {
     if (startIt == lista.end()) return 0;
     Culoare c = startIt->getCuloare();
@@ -93,18 +81,13 @@ int numaraBileAdiacente(const std::list<Bila>& lista, std::list<Bila>::const_ite
     auto it = startIt;
     while(it != lista.end() && !it->esteInDistrugere() && it->getCuloare() == c) {
         cnt++;
-        if (spreCoada) it++;
-        else {
-            if (it == lista.begin()) break;
-            it--;
-        }
+        if (spreCoada) it++; else { if (it == lista.begin()) break; it--; }
     }
     return cnt;
 }
 
 void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
     if (bile.empty()) return;
-
     for (auto it = bile.begin(); it != bile.end(); ) {
         it->actualizeaza(deltaTime);
         if (it->esteInDistrugere()) {
@@ -115,16 +98,13 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
             } else { ++it; }
         } else { ++it; }
     }
-
     if (bile.empty()) return;
 
     float deltaMiscare = viteza * deltaTime;
-
     if (distantaRetroRamasa > 0.f) {
         float pas = std::min(distantaRetroRamasa, viteza * 4.0f * deltaTime);
         distantaRetroRamasa -= pas;
         deltaMiscare = -pas;
-
         for (auto& b : bile) {
             if (!b.esteInDistrugere()) {
                 b.avanseaza(deltaMiscare);
@@ -132,53 +112,39 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
                 b.setPozitie(getPozitiePeTraseu(b.getProgres()));
             }
         }
-    }
-    else {
+    } else {
         auto it = bile.rbegin();
-
         if (it != bile.rend() && !it->esteInDistrugere()) {
             it->avanseaza(deltaMiscare);
             it->setPozitie(getPozitiePeTraseu(it->getProgres()));
         }
-
-        auto prev_it = it;
-        ++it;
-
+        auto prev_it = it; ++it;
         while (it != bile.rend()) {
             if (it->esteInDistrugere()) { ++it; continue; }
-
             float dist = it->getProgres() - prev_it->getProgres();
             float ideal = distantaIntreBile;
-
             if (dist <= ideal + 0.5f) {
                 float newP = prev_it->getProgres() + ideal;
                 it->setProgres(newP);
                 it->setPozitie(getPozitiePeTraseu(newP));
                 prev_it = it;
-            }
-            else {
+            } else {
                 bool activeazaMagnet = false;
                 if (it->getCuloare() == prev_it->getCuloare()) {
                     auto fwd_it = std::prev(it.base());
                     auto fwd_prev = std::prev(prev_it.base());
-
                     int c1 = numaraBileAdiacente(bile, fwd_prev, true);
                     int c2 = numaraBileAdiacente(bile, fwd_it, false);
-
                     if (c1 + c2 >= 3) activeazaMagnet = true;
                 }
-
                 if (activeazaMagnet) {
                     float vitezaMagnet = 500.0f;
                     float pasBack = vitezaMagnet * deltaTime;
                     float target = prev_it->getProgres() + ideal;
-
                     float nouProgres = it->getProgres() - pasBack;
-
                     if (nouProgres <= target) {
                         it->setProgres(target);
                         it->setPozitie(getPozitiePeTraseu(target));
-
                         auto fwd_it = std::prev(it.base());
                         auto fwd_prev = std::prev(prev_it.base());
                         verificaExplozieLant(fwd_it, fwd_prev);
@@ -187,9 +153,7 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
                         it->setPozitie(getPozitiePeTraseu(nouProgres));
                     }
                     prev_it = it;
-                } else {
-                    prev_it = it;
-                }
+                } else { prev_it = it; }
             }
             ++it;
         }
@@ -206,14 +170,13 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
             auto it = bile.begin();
             std::advance(it, idx);
             if (!it->areEfect() && !it->esteInDistrugere()) {
-                std::uniform_int_distribution<int> distTip(0, 3);
+                std::uniform_int_distribution<int> distTip(0, 2);
                 int tip = distTip(gen);
                 std::unique_ptr<EfectBila> e = nullptr;
                 switch(tip) {
                     case 0: e = std::make_unique<EfectExplozie>(); break;
                     case 1: e = std::make_unique<EfectRetro>(); break;
                     case 2: e = std::make_unique<EfectAccuracy>(); break;
-                    case 3: e = std::make_unique<EfectInghet>(); break;
                 }
                 if (e) it->adaugaEfect(std::move(e));
             }
@@ -228,9 +191,7 @@ void SirDeBile::explodeazaZona(Vec2f centru, float raza) {
         Vec2f pos = b.getPozitie();
         float dx = pos.x - centru.x;
         float dy = pos.y - centru.y;
-        if ((dx*dx + dy*dy) <= razaSq) {
-            b.marcheazaPentruDistrugere();
-        }
+        if ((dx*dx + dy*dy) <= razaSq) b.marcheazaPentruDistrugere();
     }
 }
 
@@ -243,7 +204,6 @@ const std::list<Bila>& SirDeBile::getBile() const { return bile; }
 
 int SirDeBile::insereazaSiVerifica(std::list<Bila>::iterator it_target, const Bila& bilaNoua) {
     float progresInserare = 0.0f;
-
     if (it_target != bile.end()) {
         progresInserare = it_target->getProgres();
         for (auto it = it_target; it != bile.end(); ++it) {
@@ -253,15 +213,12 @@ int SirDeBile::insereazaSiVerifica(std::list<Bila>::iterator it_target, const Bi
             }
         }
     } else {
-        if (!bile.empty()) {
-             progresInserare = bile.back().getProgres() - distantaIntreBile;
-        }
+        if (!bile.empty()) progresInserare = bile.back().getProgres() - distantaIntreBile;
     }
 
     Bila copie = bilaNoua;
     copie.setProgres(progresInserare);
     copie.setPozitie(getPozitiePeTraseu(progresInserare));
-
     auto it_inserat = bile.insert(it_target, copie);
 
     int scorAdaugat = 0;

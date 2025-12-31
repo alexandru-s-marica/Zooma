@@ -1,14 +1,12 @@
 #include "Meniu.h"
+#include "../Core/ResourceManager.h"
 #include <iostream>
 
 Meniu::Meniu(float width, float height, const std::string& titluMeniu, const std::vector<std::string>& optiuniText)
-    : titlu(font), indexSelectat(-1), fontIncarcat(false)
+    : titlu(ResourceManager::getInstance().getFont()),
+      indexSelectat(-1), fontIncarcat(true)
 {
-    if (!font.openFromFile("arial.ttf")) {
-        std::cerr << "[Meniu] EROARE: Nu s-a putut incarca arial.ttf\n";
-        return;
-    }
-    fontIncarcat = true;
+    const sf::Font& fontRef = ResourceManager::getInstance().getFont();
 
     titlu.setString(titluMeniu);
     titlu.setCharacterSize(50);
@@ -27,7 +25,7 @@ Meniu::Meniu(float width, float height, const std::string& titluMeniu, const std
     for (size_t i = 0; i < optiuniText.size(); ++i) {
         float x = (width - btnWidth) / 2.f;
         float y = startY + i * gap;
-        butoane.emplace_back(x, y, btnWidth, btnHeight, optiuniText[i], font);
+        butoane.emplace_back(x, y, btnWidth, btnHeight, optiuniText[i], fontRef);
     }
 }
 

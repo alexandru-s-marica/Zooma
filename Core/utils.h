@@ -1,66 +1,54 @@
 #pragma once
-
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
-struct Vec2f {
-    float x;
-    float y;
+template <typename T>
+struct Vector2D {
+    T x, y;
 
-    Vec2f(float x, float y)
-    {
-        this->x = x;
-        this->y = y;
+    Vector2D() : x(0), y(0) {}
+    Vector2D(T x, T y) : x(x), y(y) {}
+
+    Vector2D operator+(const Vector2D& other) const { return Vector2D(x + other.x, y + other.y); }
+    Vector2D operator-(const Vector2D& other) const { return Vector2D(x - other.x, y - other.y); }
+    Vector2D operator*(T scalar) const { return Vector2D(x * scalar, y * scalar); }
+
+    Vector2D& operator+=(const Vector2D& other) {
+        x += other.x;
+        y += other.y;
+        return *this;
     }
 
-    Vec2f operator+(const Vec2f& other) const { return {x + other.x, y + other.y}; }
-    Vec2f operator-(const Vec2f& other) const { return {x - other.x, y - other.y}; }
-    Vec2f operator*(float scalar) const { return {x * scalar, y * scalar}; }
-    float magnitude() const { return std::sqrt(x*x + y*y); }
+    float magnitude() const {
+        return std::sqrt(static_cast<float>(x * x + y * y));
+    }
 
-    Vec2f normalize() const { float mag = magnitude(); return {x / mag, y / mag}; }
+    Vector2D normalize() const {
+        float mag = magnitude();
+        if (mag == 0) return Vector2D(0, 0);
+        return Vector2D(x / mag, y / mag);
+    }
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Vec2f& v) {
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Vector2D<T>& v) {
     os << "(" << v.x << ", " << v.y << ")";
     return os;
 }
 
+using Vec2f = Vector2D<float>;
+
 struct Bounds {
-    Vec2f position;
+    Vec2f center;
     float radius;
 
     bool findIntersection(const Bounds& other) const {
-        float dx = position.x - other.position.x;
-        float dy = position.y - other.position.y;
-        float distance = std::sqrt(dx*dx + dy*dy);
-        return distance < (radius + other.radius);
+        float dist = (center - other.center).magnitude();
+        return dist < (radius + other.radius);
     }
 };
 
-enum class Culoare {
-    ROSU,
-    VERDE,
-    ALBASTRU,
-    GALBEN,
-    VIOLET,
-    PORTOCALIU,
-    UNKNOWN //pentru erori sau valori implicite
-};
+enum class Culoare { ROSU, VERDE, ALBASTRU, GALBEN, VIOLET, PORTOCALIU, UNKNOWN };
 
-inline std::ostream& operator<<(std::ostream& os, Culoare c) {
-    switch (c) {
-        case Culoare::ROSU: os << "ROSU"; break;
-        case Culoare::VERDE: os << "VERDE"; break;
-        case Culoare::ALBASTRU: os << "ALBASTRU"; break;
-        case Culoare::GALBEN: os << "GALBEN"; break;
-        case Culoare::VIOLET: os << "VIOLET"; break;
-        case Culoare::PORTOCALIU: os << "PORTOCALIU"; break;
-        case Culoare::UNKNOWN: os << "UNKNOWN"; break;
-    }
-    return os;
-}
-
-// Constante pentru fereastra
 const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 800;

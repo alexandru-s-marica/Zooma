@@ -17,7 +17,6 @@ private:
 
 public:
     GameRenderer(sf::RenderWindow& win, Nivel& n);
-
     void actualizeazaStareUI();
     void draw();
 };

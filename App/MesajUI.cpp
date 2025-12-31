@@ -1,31 +1,22 @@
 #include "MesajUI.h"
-#include "../Core/Exceptions.h"
-#include <iostream>
+#include "../Core/ResourceManager.h"
 
 MesajUI::MesajUI()
-    : font(),
-      activ(false),
-      textMesaj(font)
+    : font(ResourceManager::getInstance().getFont()),
+      textMesaj(ResourceManager::getInstance().getFont()),
+      activ(false)
 {
-    if (!font.openFromFile("arial.ttf")) {
-        throw ResursaLipsaException("arial.ttf");
-    }
-
     textMesaj.setCharacterSize(40);
     textMesaj.setFillColor(sf::Color::White);
     textMesaj.setOutlineColor(sf::Color::Black);
-    textMesaj.setOutlineThickness(2.f);
+    textMesaj.setOutlineThickness(2.0f);
 }
 
-void MesajUI::afiseaza(const std::string& text, sf::Vector2f pozitie) {
-    textMesaj.setString(text);
-
+void MesajUI::afiseaza(const std::string& mesaj, Vec2f pozitie) {
+    textMesaj.setString(mesaj);
     sf::FloatRect bounds = textMesaj.getLocalBounds();
-
-    textMesaj.setOrigin({bounds.size.x / 2.f, bounds.size.y / 2.f});
-
-    textMesaj.setPosition(pozitie);
-
+    textMesaj.setOrigin({bounds.size.x / 2.0f, bounds.size.y / 2.0f});
+    textMesaj.setPosition({pozitie.x, pozitie.y});
     activ = true;
 }
 
@@ -33,7 +24,7 @@ void MesajUI::ascunde() {
     activ = false;
 }
 
-void MesajUI::draw(sf::RenderWindow& window) const {
+void MesajUI::draw(sf::RenderWindow& window) {
     if (activ) {
         window.draw(textMesaj);
     }

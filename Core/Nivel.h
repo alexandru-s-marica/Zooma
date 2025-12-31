@@ -5,6 +5,7 @@
 #include <list>
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 enum class StareJoc { RULEAZA, GAME_OVER, CASTIGAT };
 
@@ -23,21 +24,21 @@ private:
     std::vector<AnimatieExplozie> exploziiVizuale;
 
     int scor;
+    int highScore;
     StareJoc stare;
 
     int nivelCurent;
 
     bool modAccuracyActiv;
     float timpRamasAccuracy;
-    bool esteInghetat;
-    float timpRamasInghet;
 
     void genereazaTraseu(int nivel);
     void gestioneazaColiziuni();
+    void incarcaHighScore();
+    void salveazaHighScore();
 
 public:
     Nivel();
-    explicit Nivel(float initialBallSpacing);
 
     void incarcaNivel(int numarNivel);
     void reset();
@@ -52,8 +53,8 @@ public:
     const std::list<std::pair<Bila, Vec2f>>& getProiectileInZbor() const;
 
     int getScor() const;
+    int getHighScore() const;
     int getNivelCurent() const { return nivelCurent; }
-
     const std::vector<Vec2f>& getTraseu() const;
 
     StareJoc getStareJoc() const;
@@ -66,7 +67,6 @@ public:
     void activeazaExplozieLa(Vec2f pozitie);
     void activeazaRetro();
     void activeazaModAccuracy(float durata);
-    void activeazaInghet(float durata);
 
     friend std::ostream& operator<<(std::ostream& os, const Nivel& n);
 };

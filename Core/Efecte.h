@@ -1,67 +1,38 @@
 #pragma once
-#include "utils.h"
-#include <iostream>
 #include <memory>
-#include <string>
+#include "utils.h" // Pentru Vec2f
 
 class Nivel;
 
 class EfectBila {
-protected:
-    std::string numeEfect;
-    explicit EfectBila(std::string nume) : numeEfect(std::move(nume)) {}
-
-    virtual void doAplica(Nivel& nivel, Vec2f pozitie) = 0;
-
 public:
     virtual ~EfectBila() = default;
+
+    void activeazaEfect(Nivel& nivel);
+
     virtual std::unique_ptr<EfectBila> clone() const = 0;
 
-    const std::string& getNume() const { return numeEfect; }
-
-    void activeaza(Nivel& nivel, Vec2f pozitie) {
-        std::cout << "[Efect] Activare: " << getNume() << " la " << pozitie << "\n";
-        doAplica(nivel, pozitie);
-    }
+protected:
+    virtual void doAplica(Nivel& nivel) = 0;
 };
 
 class EfectExplozie : public EfectBila {
-public:
-    EfectExplozie() : EfectBila("Explozie (Boom)") {}
-    std::unique_ptr<EfectBila> clone() const override {
-        return std::make_unique<EfectExplozie>(*this);
-    }
 protected:
-    void doAplica(Nivel& nivel, Vec2f pozitie) override;
+    void doAplica(Nivel& nivel) override;
+public:
+    std::unique_ptr<EfectBila> clone() const override;
 };
 
 class EfectRetro : public EfectBila {
-public:
-    EfectRetro() : EfectBila("Retro (Time Back)") {}
-    std::unique_ptr<EfectBila> clone() const override {
-        return std::make_unique<EfectRetro>(*this);
-    }
 protected:
-    void doAplica(Nivel& nivel, Vec2f pozitie) override;
+    void doAplica(Nivel& nivel) override;
+public:
+    std::unique_ptr<EfectBila> clone() const override;
 };
 
 class EfectAccuracy : public EfectBila {
-    float durata;
-public:
-    EfectAccuracy() : EfectBila("Accuracy (Laser Sight)"), durata(5.0f) {}
-    std::unique_ptr<EfectBila> clone() const override {
-        return std::make_unique<EfectAccuracy>(*this);
-    }
 protected:
-    void doAplica(Nivel& nivel, Vec2f pozitie) override;
-};
-
-class EfectInghet : public EfectBila {
+    void doAplica(Nivel& nivel) override;
 public:
-    EfectInghet() : EfectBila("Inghet (Freeze)") {}
-    std::unique_ptr<EfectBila> clone() const override {
-        return std::make_unique<EfectInghet>(*this);
-    }
-protected:
-    void doAplica(Nivel& nivel, Vec2f pozitie) override;
+    std::unique_ptr<EfectBila> clone() const override;
 };

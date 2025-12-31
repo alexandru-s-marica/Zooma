@@ -1,18 +1,17 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <string>
+#include "../Core/utils.h"
 
 class MesajUI {
 private:
-    sf::Font font;
-    bool activ;
+    const sf::Font& font;
     sf::Text textMesaj;
+    bool activ;
 
 public:
     MesajUI();
-
-    void afiseaza(const std::string& mesaj, sf::Vector2f pozitie);
+    void afiseaza(const std::string& mesaj, Vec2f pozitie);
     void ascunde();
-
-    void draw(sf::RenderWindow& window) const;
+    void draw(sf::RenderWindow& window);
 };

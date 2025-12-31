@@ -28,7 +28,7 @@ void Proiector::genereazaBilaUrmatoare(const std::vector<Culoare>& culoriDisponi
     bilaUrmatoare = Bila(static_cast<Culoare>(tipCuloare), pozitie, 20.f);
 
     std::uniform_int_distribution<int> distEfect(0, 100);
-    if (distEfect(generator) < 10) {
+    if (distEfect(generator) < 5) {
     }
 }
 
