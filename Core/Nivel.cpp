@@ -224,3 +224,7 @@ Bila Nivel::trageBilaJucator() { std::vector<Culoare> c = sirBile.getCuloriActiv
 void Nivel::activeazaExplozieLa(Vec2f pozitie) { sirBile.explodeazaZona(pozitie, 250.0f); exploziiVizuale.push_back({pozitie, 250.0f, 1.0f}); }
 void Nivel::activeazaRetro() { sirBile.aplicaRetro(300.0f); }
 void Nivel::activeazaModAccuracy(float durata) { modAccuracyActiv = true; timpRamasAccuracy = durata; }
+
+void Nivel::adaugaScor(int valoare) {
+    scor += valoare;
+}

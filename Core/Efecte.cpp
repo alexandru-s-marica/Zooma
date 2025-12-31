@@ -9,7 +9,6 @@ void EfectBila::activeazaEfect(Nivel& nivel) {
 void EfectExplozie::doAplica(Nivel& nivel) {
     (void)nivel;
 }
-
 std::unique_ptr<EfectBila> EfectExplozie::clone() const {
     return std::make_unique<EfectExplozie>(*this);
 }
@@ -17,7 +16,6 @@ std::unique_ptr<EfectBila> EfectExplozie::clone() const {
 void EfectRetro::doAplica(Nivel& nivel) {
     nivel.activeazaRetro();
 }
-
 std::unique_ptr<EfectBila> EfectRetro::clone() const {
     return std::make_unique<EfectRetro>(*this);
 }
@@ -25,7 +23,13 @@ std::unique_ptr<EfectBila> EfectRetro::clone() const {
 void EfectAccuracy::doAplica(Nivel& nivel) {
     nivel.activeazaModAccuracy(10.0f);
 }
-
 std::unique_ptr<EfectBila> EfectAccuracy::clone() const {
     return std::make_unique<EfectAccuracy>(*this);
+}
+
+void EfectBonusScor::doAplica(Nivel& nivel) {
+    nivel.adaugaScor(500);
+}
+std::unique_ptr<EfectBila> EfectBonusScor::clone() const {
+    return std::make_unique<EfectBonusScor>(*this);
 }

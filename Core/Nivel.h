@@ -68,5 +68,7 @@ public:
     void activeazaRetro();
     void activeazaModAccuracy(float durata);
 
+    void adaugaScor(int valoare);
+
     friend std::ostream& operator<<(std::ostream& os, const Nivel& n);
 };

@@ -170,13 +170,14 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
             auto it = bile.begin();
             std::advance(it, idx);
             if (!it->areEfect() && !it->esteInDistrugere()) {
-                std::uniform_int_distribution<int> distTip(0, 2);
+                std::uniform_int_distribution<int> distTip(0, 3);
                 int tip = distTip(gen);
                 std::unique_ptr<EfectBila> e = nullptr;
                 switch(tip) {
                     case 0: e = std::make_unique<EfectExplozie>(); break;
                     case 1: e = std::make_unique<EfectRetro>(); break;
                     case 2: e = std::make_unique<EfectAccuracy>(); break;
+                    case 3: e = std::make_unique<EfectBonusScor>(); break;
                 }
                 if (e) it->adaugaEfect(std::move(e));
             }
