@@ -6,7 +6,7 @@
 const float PI = 3.14159265f;
 
 float calculeazaVitezaNivel(int nivel) {
-    return 60.0f + (nivel - 1) * 25.0f;
+    return 60.0f + (nivel - 1) * 20.0f;
 }
 
 float calculeazaDistantaBile(int nivel) {
@@ -20,6 +20,7 @@ void Nivel::genereazaTraseu(int nivel) {
     Vec2f pozProiector = {400.f, 500.f};
 
     if (nivel == 1) {
+        pozProiector = {400.f, 500.f};
         for (int i = 0; i < 200; ++i) traseu.push_back({100.f + i * 3, 100.f});
         for (int i = 0; i < 150; ++i) traseu.push_back({700.f, 100.f + i * 2});
         for (int i = 0; i < 200; ++i) traseu.push_back({700.f - i * 3, 400.f});
@@ -69,13 +70,79 @@ void Nivel::genereazaTraseu(int nivel) {
             traseu.push_back({x, y});
         }
     }
-    else {
+    else if (nivel == 5) {
         pozProiector = {400.f, 300.f};
         for(int i=0; i<700; i+=2) traseu.push_back({50.f + i, 50.f});
         for(int i=0; i<500; i+=2) traseu.push_back({750.f, 50.f + i});
         for(int i=0; i<700; i+=2) traseu.push_back({750.f - i, 550.f});
         for(int i=0; i<400; i+=2) traseu.push_back({50.f, 550.f - i});
         for(int i=0; i<300; i+=2) traseu.push_back({50.f + i, 150.f});
+    }
+    else if (nivel == 6) {
+        pozProiector = {400.f, 300.f};
+
+        std::vector<Vec2f> puncte = {
+            {50.f, 50.f}, {750.f, 50.f},
+            {400.f, 250.f},
+            {50.f, 550.f}, {750.f, 550.f}
+        };
+
+        for (size_t k = 0; k < puncte.size() - 1; ++k) {
+            Vec2f p1 = puncte[k];
+            Vec2f p2 = puncte[k+1];
+            float dist = (p2 - p1).magnitude();
+            int pasi = static_cast<int>(dist / 2.0f);
+            for (int i = 0; i < pasi; ++i) {
+                float t = (float)i / pasi;
+                traseu.push_back(p1 + (p2 - p1) * t);
+            }
+        }
+    }
+    else if (nivel == 7) {
+        pozProiector = {400.f, 100.f};
+        int pasi = 800;
+        for (int i = 0; i < pasi; ++i) {
+            float t = (float)i / pasi * 2.0f * PI;
+            float x = 400.f + 350.f * std::cos(t);
+            float y = 300.f + 150.f * std::sin(2.0f * t);
+            traseu.push_back({x, y});
+        }
+    }
+    else if (nivel == 8) {
+        pozProiector = {400.f, 550.f};
+
+        for(int row=0; row<5; ++row) {
+            float y = 50.f + row * 100.f;
+            if (row % 2 == 0) {
+                for(int x=50; x<=750; x+=2) traseu.push_back({(float)x, y});
+                for(int dy=0; dy<100; dy+=2) traseu.push_back({750.f, y + dy});
+            } else {
+                for(int x=750; x>=50; x-=2) traseu.push_back({(float)x, y});
+                for(int dy=0; dy<100; dy+=2) traseu.push_back({50.f, y + dy});
+            }
+        }
+    }
+    else if (nivel == 9) {
+        pozProiector = {400.f, 300.f};
+        int pasi = 800;
+        for (int i = 0; i < pasi; ++i) {
+            float t = (float)i / pasi * 2.0f * PI;
+            float k = 4.0f;
+            float r = 300.f * std::cos(k * t);
+            float x = 400.f + r * std::cos(t);
+            float y = 300.f + r * std::sin(t);
+            traseu.push_back({x, y});
+        }
+    }
+    else {
+        pozProiector = {400.f, 250.f};
+        int pasi = 1000;
+        for (int i = 0; i < pasi; ++i) {
+            float t = (float)i / pasi * 2.0f * PI;
+            float x = 400.f + 12.f * (16.f * std::pow(std::sin(t), 3));
+            float y = 300.f - 12.f * (13.f * std::cos(t) - 5.f * std::cos(2*t) - 2.f * std::cos(3*t) - std::cos(4*t));
+            traseu.push_back({x, y});
+        }
     }
 
     proiector.setPozitie(pozProiector);
