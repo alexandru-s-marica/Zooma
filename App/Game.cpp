@@ -68,8 +68,13 @@ void Game::handleMeniuPrincipalInput(const sf::Event& event) {
 void Game::handleJocInput(const sf::Event& event) {
     if (const auto* keyEvent = event.getIf<sf::Event::KeyPressed>()) {
         if (keyEvent->code == sf::Keyboard::Key::Escape) stareAplicatie = AppState::PAUZA;
+
         if (nivel.esteCastigat() && keyEvent->code == sf::Keyboard::Key::N) {
             nivel.incarcaNivel(nivel.getNivelCurent() + 1);
+        }
+
+        if (nivel.esteVictorieFinala() && keyEvent->code == sf::Keyboard::Key::R) {
+            nivel.incarcaNivel(1);
         }
     }
 

@@ -17,7 +17,6 @@ float calculeazaDistantaBile(int nivel) {
     return 40.0f;
 }
 
-// Logica principala: Incearca fisier -> Daca nu, Generare + Salvare
 void Nivel::genereazaTraseu(int nivel) {
     std::string numeFisier = "level_" + std::to_string(nivel) + ".txt";
 
@@ -151,6 +150,7 @@ void Nivel::genereazaTraseuProcedural(int nivel) {
         }
     }
     else {
+        // Nivel 10 (si fallback pentru generare)
         pozProiector = {400.f, 250.f};
         for (int i = 0; i < 1000; ++i) {
             float t = (float)i / 1000 * 2.0f * PI;
@@ -162,13 +162,17 @@ void Nivel::genereazaTraseuProcedural(int nivel) {
     proiector.setPozitie(pozProiector);
 }
 
-
 Nivel::Nivel()
     : sirBile(), proiector({400.f, 500.f}), scor(0), highScore(0),
       stare(StareJoc::RULEAZA), nivelCurent(1),
       modAccuracyActiv(false), timpRamasAccuracy(0.0f)
 {
-    try { incarcaHighScore(); } catch (const FisierCoruptException& e) { std::cerr << e.what() << std::endl; highScore = 0; }
+    try {
+        incarcaHighScore();
+    } catch (const FisierCoruptException& e) {
+        std::cerr << e.what() << std::endl;
+        highScore = 0;
+    }
 
     incarcaNivel(1);
 }
@@ -180,16 +184,29 @@ void Nivel::incarcaHighScore() {
     in.close();
 }
 
-void Nivel::salveazaHighScore() { std::ofstream out("highscore.txt"); if (out.is_open()) { out << highScore; out.close(); } }
+void Nivel::salveazaHighScore() {
+    std::ofstream out("highscore.txt");
+    if (out.is_open()) { out << highScore; out.close(); }
+}
 
 void Nivel::incarcaNivel(int numarNivel) {
-    nivelCurent = numarNivel; reset();
+    if (numarNivel > 10) {
+        stare = StareJoc::VICTORIE_FINALA;
+        std::cout << "--- FELICITARI! AI TERMINAT TOATE NIVELELE! ---\n";
+        return;
+    }
+
+    nivelCurent = numarNivel;
+    reset();
     std::cout << "--- INCARCARE NIVEL " << nivelCurent << " ---\n";
 }
 
 void Nivel::reset() {
-    stare = StareJoc::RULEAZA; modAccuracyActiv = false; timpRamasAccuracy = 0.0f;
-    proiectileInZbor.clear(); exploziiVizuale.clear();
+    stare = StareJoc::RULEAZA;
+    modAccuracyActiv = false;
+    timpRamasAccuracy = 0.0f;
+    proiectileInZbor.clear();
+    exploziiVizuale.clear();
 
     genereazaTraseu(nivelCurent);
 
@@ -199,7 +216,9 @@ void Nivel::reset() {
 }
 
 void Nivel::ruleazaFrame(float deltaTime) {
+    if (stare == StareJoc::VICTORIE_FINALA) return;
     if (stare != StareJoc::RULEAZA) return;
+
     float vitezaProiectil = 1000.f;
     if (modAccuracyActiv) vitezaProiectil = 2500.f;
 
@@ -252,7 +271,10 @@ void Nivel::gestioneazaColiziuni() {
     }
 }
 
-void Nivel::adaugaProiectil(const Bila& p, const Vec2f& dir) { proiectileInZbor.push_back({p, dir}); }
+void Nivel::adaugaProiectil(const Bila& p, const Vec2f& dir) {
+    proiectileInZbor.push_back({p, dir});
+}
+
 const std::list<Bila>& Nivel::getSirDeBile() const { return sirBile.getBile(); }
 Proiector& Nivel::getProiector() { return proiector; }
 const Proiector& Nivel::getProiector() const { return proiector; }
@@ -263,12 +285,33 @@ const std::vector<Vec2f>& Nivel::getTraseu() const { return traseu; }
 StareJoc Nivel::getStareJoc() const { return stare; }
 bool Nivel::esteTerminat() const { return stare == StareJoc::GAME_OVER; }
 bool Nivel::esteCastigat() const { return stare == StareJoc::CASTIGAT; }
-std::ostream& operator<<(std::ostream& os, const Nivel& n) { os << "Nivel " << n.nivelCurent << " (Scor: " << n.scor << ")\n"; return os; }
-Bila Nivel::trageBilaJucator() { std::vector<Culoare> c = sirBile.getCuloriActive(); return proiector.trage(c); }
+
+bool Nivel::esteVictorieFinala() const { return stare == StareJoc::VICTORIE_FINALA; }
+
+std::ostream& operator<<(std::ostream& os, const Nivel& n) {
+    os << "Nivel " << n.nivelCurent << " (Scor: " << n.scor << ")\n";
+    return os;
+}
+
+Bila Nivel::trageBilaJucator() {
+    std::vector<Culoare> c = sirBile.getCuloriActive();
+    return proiector.trage(c);
+}
+
 void Nivel::activeazaExplozieLa(Vec2f pozitie, float raza) {
     sirBile.explodeazaZona(pozitie, raza);
     exploziiVizuale.push_back({pozitie, raza, 1.0f});
 }
-void Nivel::activeazaRetro(float distanta) { sirBile.aplicaRetro(distanta); }
-void Nivel::activeazaModAccuracy(float durata) { modAccuracyActiv = true; timpRamasAccuracy = durata; }
-void Nivel::adaugaScor(int valoare) { scor += valoare; }
+
+void Nivel::activeazaRetro(float distanta) {
+    sirBile.aplicaRetro(distanta);
+}
+
+void Nivel::activeazaModAccuracy(float durata) {
+    modAccuracyActiv = true;
+    timpRamasAccuracy = durata;
+}
+
+void Nivel::adaugaScor(int valoare) {
+    scor += valoare;
+}

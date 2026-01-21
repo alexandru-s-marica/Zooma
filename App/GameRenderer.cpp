@@ -1,7 +1,6 @@
 #include "GameRenderer.h"
 #include "../Core/ResourceManager.h"
 #include <cmath>
-#include <variant>
 #include <iostream>
 
 sf::Color getSfmlColor(Culoare c) {
@@ -19,7 +18,7 @@ sf::Color getSfmlColor(Culoare c) {
 
 GameRenderer::GameRenderer(sf::RenderWindow& win, Nivel& n)
     : window(win), nivel(n), font(),
-      textNivel(ResourceManager::getInstance().getFont()) // <--- FIX AICI
+      textNivel(ResourceManager::getInstance().getFont())
 {
     textNivel.setCharacterSize(24);
     textNivel.setFillColor(sf::Color::White);
@@ -33,11 +32,14 @@ void GameRenderer::actualizeazaStareUI() {
     float centerX = window.getSize().x / 2.0f;
     float centerY = window.getSize().y / 2.0f;
 
-    if (stare == StareJoc::GAME_OVER) {
+    if (nivel.esteVictorieFinala()) {
+        mesajManager.afiseaza("FELICITARI! AI TERMINAT JOCUL!\nScor Final: " + std::to_string(nivel.getScor()) + "\nApasa 'R' pentru a juca din nou", {centerX, centerY});
+    }
+    else if (stare == StareJoc::GAME_OVER) {
         mesajManager.afiseaza("GAME OVER\nApasa 'R' pentru Restart", {centerX, centerY});
     }
     else if (nivel.esteCastigat()) {
-        mesajManager.afiseaza("VICTORIE!\nApasa 'N' pentru Nivelul Urmator", {centerX, centerY});
+        mesajManager.afiseaza("NIVEL COMPLET!\nApasa 'N' pentru Nivelul Urmator", {centerX, centerY});
     }
     else {
         mesajManager.ascunde();
@@ -53,7 +55,6 @@ void GameRenderer::draw() {
     drawProiector();
     drawProiectile();
     drawUI();
-
     mesajManager.draw(window);
 }
 
@@ -160,7 +161,6 @@ void GameRenderer::drawAccuracyLine() {
 
 void GameRenderer::drawProiector() {
     const Proiector& proiectorCore = nivel.getProiector();
-
     const Bila& bilaProiector = proiectorCore.getBilaCurenta();
     sf::CircleShape formaProiector(bilaProiector.getRaza());
     formaProiector.setFillColor(getSfmlColor(bilaProiector.getCuloare()));

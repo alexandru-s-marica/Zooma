@@ -8,7 +8,7 @@
 #include <fstream>
 #include <string>
 
-enum class StareJoc { RULEAZA, GAME_OVER, CASTIGAT };
+enum class StareJoc { RULEAZA, GAME_OVER, CASTIGAT, VICTORIE_FINALA };
 
 struct AnimatieExplozie {
     Vec2f pozitie;
@@ -65,6 +65,8 @@ public:
     StareJoc getStareJoc() const;
     bool esteTerminat() const;
     bool esteCastigat() const;
+
+    bool esteVictorieFinala() const;
 
     bool esteAccuracyActiv() const { return modAccuracyActiv; }
     const std::vector<AnimatieExplozie>& getExploziiVizuale() const { return exploziiVizuale; }
