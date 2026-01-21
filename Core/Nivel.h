@@ -6,6 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 enum class StareJoc { RULEAZA, GAME_OVER, CASTIGAT };
 
@@ -33,6 +34,10 @@ private:
     float timpRamasAccuracy;
 
     void genereazaTraseu(int nivel);
+    void genereazaTraseuProcedural(int nivel);
+    bool incarcaTraseuDinFisier(const std::string& numeFisier);
+    void salveazaTraseuInFisier(const std::string& numeFisier);
+
     void gestioneazaColiziuni();
     void incarcaHighScore();
     void salveazaHighScore();
