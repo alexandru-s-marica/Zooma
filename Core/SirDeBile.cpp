@@ -91,8 +91,18 @@ static int numaraBileAdiacenteHelper(const std::list<Bila>& lista, std::list<Bil
 
 void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
     if (bile.empty()) return;
+
+    curataBileDistruse(nivel);
+
+    if (bile.empty()) return;
+
+    proceseazaMiscare(deltaTime);
+    genereazaEfecteRandom(deltaTime);
+}
+
+void SirDeBile::curataBileDistruse(Nivel& nivel) {
     for (auto it = bile.begin(); it != bile.end(); ) {
-        it->actualizeaza(deltaTime);
+        it->actualizeaza(0.016f);
         if (it->esteInDistrugere()) {
             if (it->eGataDeSters()) {
                 if (it->areEfect()) it->activeazaEfect(nivel);
@@ -101,67 +111,84 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
             } else { ++it; }
         } else { ++it; }
     }
-    if (bile.empty()) return;
+}
 
-    float deltaMiscare = viteza * deltaTime;
+void SirDeBile::proceseazaMiscare(float deltaTime) {
     if (distantaRetroRamasa > 0.f) {
-        float pas = std::min(distantaRetroRamasa, viteza * 4.0f * deltaTime);
-        distantaRetroRamasa -= pas;
-        deltaMiscare = -pas;
-        for (auto& b : bile) {
-            if (!b.esteInDistrugere()) {
-                b.avanseaza(deltaMiscare);
-                if (b.getProgres() < 0.f) b.setProgres(0.f);
-                b.setPozitie(getPozitiePeTraseu(b.getProgres()));
-            }
-        }
+        aplicaMiscareRetro(deltaTime);
     } else {
-        auto it = bile.rbegin();
-        if (it != bile.rend() && !it->esteInDistrugere()) {
-            it->avanseaza(deltaMiscare);
-            it->setPozitie(getPozitiePeTraseu(it->getProgres()));
-        }
-        auto prev_it = it; ++it;
-        while (it != bile.rend()) {
-            if (it->esteInDistrugere()) { ++it; continue; }
-            float dist = it->getProgres() - prev_it->getProgres();
-            float ideal = distantaIntreBile;
-            if (dist <= ideal + 0.5f) {
-                float newP = prev_it->getProgres() + ideal;
-                it->setProgres(newP);
-                it->setPozitie(getPozitiePeTraseu(newP));
-                prev_it = it;
-            } else {
-                bool activeazaMagnet = false;
-                if (it->getCuloare() == prev_it->getCuloare()) {
-                    auto fwd_it = std::prev(it.base());
-                    auto fwd_prev = std::prev(prev_it.base());
-                    int c1 = numaraBileAdiacenteHelper(bile, fwd_prev, true);
-                    int c2 = numaraBileAdiacenteHelper(bile, fwd_it, false);
-                    if (c1 + c2 >= 3) activeazaMagnet = true;
-                }
-                if (activeazaMagnet) {
-                    float vitezaMagnet = 500.0f;
-                    float pasBack = vitezaMagnet * deltaTime;
-                    float target = prev_it->getProgres() + ideal;
-                    float nouProgres = it->getProgres() - pasBack;
-                    if (nouProgres <= target) {
-                        it->setProgres(target);
-                        it->setPozitie(getPozitiePeTraseu(target));
-                        auto fwd_it = std::prev(it.base());
-                        auto fwd_prev = std::prev(prev_it.base());
-                        verificaExplozieLant(fwd_it, fwd_prev);
-                    } else {
-                        it->setProgres(nouProgres);
-                        it->setPozitie(getPozitiePeTraseu(nouProgres));
-                    }
-                    prev_it = it;
-                } else { prev_it = it; }
-            }
-            ++it;
+        aplicaMiscareNormala(deltaTime);
+    }
+}
+
+void SirDeBile::aplicaMiscareRetro(float deltaTime) {
+    float pas = std::min(distantaRetroRamasa, viteza * 4.0f * deltaTime);
+    distantaRetroRamasa -= pas;
+    float deltaMiscare = -pas;
+
+    for (auto& b : bile) {
+        if (!b.esteInDistrugere()) {
+            b.avanseaza(deltaMiscare);
+            if (b.getProgres() < 0.f) b.setProgres(0.f);
+            b.setPozitie(getPozitiePeTraseu(b.getProgres()));
         }
     }
+}
 
+void SirDeBile::aplicaMiscareNormala(float deltaTime) {
+    float deltaMiscare = viteza * deltaTime;
+    auto it = bile.rbegin();
+    if (it != bile.rend() && !it->esteInDistrugere()) {
+        it->avanseaza(deltaMiscare);
+        it->setPozitie(getPozitiePeTraseu(it->getProgres()));
+    }
+
+    auto prev_it = it; ++it;
+    while (it != bile.rend()) {
+        if (it->esteInDistrugere()) { ++it; continue; }
+
+        float dist = it->getProgres() - prev_it->getProgres();
+        float ideal = distantaIntreBile;
+
+        if (dist <= ideal + 0.5f) {
+            float newP = prev_it->getProgres() + ideal;
+            it->setProgres(newP);
+            it->setPozitie(getPozitiePeTraseu(newP));
+            prev_it = it;
+        } else {
+            bool activeazaMagnet = false;
+            if (it->getCuloare() == prev_it->getCuloare()) {
+                auto fwd_it = std::prev(it.base());
+                auto fwd_prev = std::prev(prev_it.base());
+                int c1 = numaraBileAdiacenteHelper(bile, fwd_prev, true);
+                int c2 = numaraBileAdiacenteHelper(bile, fwd_it, false);
+                if (c1 + c2 >= 3) activeazaMagnet = true;
+            }
+
+            if (activeazaMagnet) {
+                float vitezaMagnet = 500.0f;
+                float pasBack = vitezaMagnet * deltaTime;
+                float target = prev_it->getProgres() + ideal;
+                float nouProgres = it->getProgres() - pasBack;
+
+                if (nouProgres <= target) {
+                    it->setProgres(target);
+                    it->setPozitie(getPozitiePeTraseu(target));
+                    auto fwd_it = std::prev(it.base());
+                    auto fwd_prev = std::prev(prev_it.base());
+                    verificaExplozieLant(fwd_it, fwd_prev);
+                } else {
+                    it->setProgres(nouProgres);
+                    it->setPozitie(getPozitiePeTraseu(nouProgres));
+                }
+                prev_it = it;
+            } else { prev_it = it; }
+        }
+        ++it;
+    }
+}
+
+void SirDeBile::genereazaEfecteRandom(float deltaTime) {
     timerGenerareEfectRandom += deltaTime;
     if (timerGenerareEfectRandom > 5.0f) {
         timerGenerareEfectRandom = 0.f;

@@ -20,6 +20,12 @@ private:
     Vec2f getPozitiePeTraseu(float progres) const;
     void verificaExplozieLant(std::list<Bila>::iterator stanga, std::list<Bila>::iterator dreapta);
 
+    void curataBileDistruse(Nivel& nivel);
+    void proceseazaMiscare(float deltaTime);
+    void aplicaMiscareRetro(float deltaTime);
+    void aplicaMiscareNormala(float deltaTime);
+    void genereazaEfecteRandom(float deltaTime);
+
 public:
     SirDeBile();
     SirDeBile(std::vector<Vec2f> traseu, float viteza, float distanta);
