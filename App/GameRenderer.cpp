@@ -45,15 +45,29 @@ void GameRenderer::actualizeazaStareUI() {
 }
 
 void GameRenderer::draw() {
+    drawSidePanel();
+    drawTraseu();
+    drawBile();
+    drawExplozii();
+    drawAccuracyLine();
+    drawProiector();
+    drawProiectile();
+    drawUI();
+
+    mesajManager.draw(window);
+}
+
+void GameRenderer::drawSidePanel() {
     sf::RectangleShape sidePanel({400.f, 800.f});
     sidePanel.setPosition({800.f, 0.f});
     sidePanel.setFillColor(sf::Color(30, 30, 50));
     sidePanel.setOutlineColor(sf::Color::White);
     sidePanel.setOutlineThickness(-2.0f);
     window.draw(sidePanel);
+}
 
+void GameRenderer::drawTraseu() {
     const std::vector<Vec2f>& puncteTraseu = nivel.getTraseu();
-
     if (!puncteTraseu.empty()) {
         Vec2f punctFinal = puncteTraseu.back();
         sf::CircleShape gaura(25.f);
@@ -71,7 +85,9 @@ void GameRenderer::draw() {
         }
         window.draw(linieTraseu);
     }
+}
 
+void GameRenderer::drawBile() {
     for (const auto& bilaCore : nivel.getSirDeBile()) {
         sf::CircleShape formaBila(bilaCore.getRaza());
         sf::Color c = getSfmlColor(bilaCore.getCuloare());
@@ -97,7 +113,9 @@ void GameRenderer::draw() {
         formaBila.setPosition({bilaCore.getPozitie().x, bilaCore.getPozitie().y});
         window.draw(formaBila);
     }
+}
 
+void GameRenderer::drawExplozii() {
     for (const auto& explozie : nivel.getExploziiVizuale()) {
         float progres = 1.0f - explozie.timer;
         float razaCurenta = explozie.razaMaxima * progres;
@@ -122,7 +140,9 @@ void GameRenderer::draw() {
         window.draw(cerc);
         window.draw(inel);
     }
+}
 
+void GameRenderer::drawAccuracyLine() {
     if (nivel.esteAccuracyActiv()) {
         Vec2f posProiector = nivel.getProiector().getPozitie();
         sf::Vector2i mousePixel = sf::Mouse::getPosition(window);
@@ -136,8 +156,11 @@ void GameRenderer::draw() {
         };
         window.draw(linie, 2, sf::PrimitiveType::Lines);
     }
+}
 
+void GameRenderer::drawProiector() {
     const Proiector& proiectorCore = nivel.getProiector();
+
     const Bila& bilaProiector = proiectorCore.getBilaCurenta();
     sf::CircleShape formaProiector(bilaProiector.getRaza());
     formaProiector.setFillColor(getSfmlColor(bilaProiector.getCuloare()));
@@ -161,7 +184,9 @@ void GameRenderer::draw() {
     formaBilaUrmatoare.setOrigin({razaMica, razaMica});
     formaBilaUrmatoare.setPosition({proiectorCore.getPozitie().x + 50.f, proiectorCore.getPozitie().y + 50.f});
     window.draw(formaBilaUrmatoare);
+}
 
+void GameRenderer::drawProiectile() {
     for (const auto& p : nivel.getProiectileInZbor()) {
         const Bila& b = p.first;
         sf::CircleShape formaProiectil(b.getRaza());
@@ -174,13 +199,13 @@ void GameRenderer::draw() {
         formaProiectil.setPosition({b.getPozitie().x, b.getPozitie().y});
         window.draw(formaProiectil);
     }
+}
 
+void GameRenderer::drawUI() {
     std::string stats = "Nivel: " + std::to_string(nivel.getNivelCurent()) +
                         "\n\nScor: " + std::to_string(nivel.getScor()) +
                         "\n\nHigh Score: " + std::to_string(nivel.getHighScore()) +
                         "\n\nTotal Distruse: " + std::to_string(Bila::getBileDistruseTotal());
     textNivel.setString(stats);
     window.draw(textNivel);
-
-    mesajManager.draw(window);
 }

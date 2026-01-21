@@ -15,6 +15,15 @@ private:
     sf::Font font;
     sf::Text textNivel;
 
+    void drawSidePanel();
+    void drawTraseu();
+    void drawBile();
+    void drawExplozii();
+    void drawAccuracyLine();
+    void drawProiector();
+    void drawProiectile();
+    void drawUI();
+
 public:
     GameRenderer(sf::RenderWindow& win, Nivel& n);
     void actualizeazaStareUI();
