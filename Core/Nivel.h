@@ -64,10 +64,9 @@ public:
     bool esteAccuracyActiv() const { return modAccuracyActiv; }
     const std::vector<AnimatieExplozie>& getExploziiVizuale() const { return exploziiVizuale; }
 
-    void activeazaExplozieLa(Vec2f pozitie);
-    void activeazaRetro();
+    void activeazaExplozieLa(Vec2f pozitie, float raza);
+    void activeazaRetro(float distanta);
     void activeazaModAccuracy(float durata);
-
     void adaugaScor(int valoare);
 
     friend std::ostream& operator<<(std::ostream& os, const Nivel& n);

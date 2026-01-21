@@ -33,65 +33,7 @@ void Nivel::genereazaTraseu(int nivel) {
             traseu.push_back({400.f + raza * std::cos(unghi), 300.f + raza * std::sin(unghi)});
         }
     }
-    else if (nivel == 3) {
-        pozProiector = {100.f, 550.f};
-        std::vector<Vec2f> pts = {{50.f, 50.f}, {750.f, 50.f}, {50.f, 200.f}, {750.f, 200.f}, {50.f, 350.f}, {750.f, 350.f}, {50.f, 500.f}, {750.f, 500.f}};
-        for (size_t k = 0; k < pts.size() - 1; ++k) {
-            Vec2f p1 = pts[k]; Vec2f p2 = pts[k+1]; float dist = (p2 - p1).magnitude(); int pasi = static_cast<int>(dist / 2.0f);
-            for (int i = 0; i < pasi; ++i) traseu.push_back(p1 + (p2 - p1) * ((float)i / pasi));
-        }
-    }
-    else if (nivel == 4) {
-        pozProiector = {400.f, 100.f};
-        for (int i = 0; i < 700; ++i) {
-            float t = (float)i / 700;
-            traseu.push_back({50.f + t * 700.f, 300.f + 200.f * std::sin(t * 4.0f * PI)});
-        }
-    }
-    else if (nivel == 5) {
-        pozProiector = {400.f, 300.f};
-        for(int i=0; i<700; i+=2) traseu.push_back({50.f + i, 50.f});
-        for(int i=0; i<500; i+=2) traseu.push_back({750.f, 50.f + i});
-        for(int i=0; i<700; i+=2) traseu.push_back({750.f - i, 550.f});
-        for(int i=0; i<400; i+=2) traseu.push_back({50.f, 550.f - i});
-        for(int i=0; i<300; i+=2) traseu.push_back({50.f + i, 150.f});
-    }
-    else if (nivel == 6) {
-        pozProiector = {400.f, 300.f};
-        std::vector<Vec2f> pts = {{50.f, 50.f}, {750.f, 50.f}, {400.f, 250.f}, {50.f, 550.f}, {750.f, 550.f}};
-        for (size_t k = 0; k < pts.size() - 1; ++k) {
-            Vec2f p1 = pts[k]; Vec2f p2 = pts[k+1]; float dist = (p2 - p1).magnitude(); int pasi = static_cast<int>(dist / 2.0f);
-            for (int i = 0; i < pasi; ++i) traseu.push_back(p1 + (p2 - p1) * ((float)i / pasi));
-        }
-    }
-    else if (nivel == 7) {
-        pozProiector = {400.f, 100.f};
-        for (int i = 0; i < 800; ++i) {
-            float t = (float)i / 800 * 2.0f * PI;
-            traseu.push_back({400.f + 350.f * std::cos(t), 300.f + 150.f * std::sin(2.0f * t)});
-        }
-    }
-    else if (nivel == 8) {
-        pozProiector = {400.f, 550.f};
-        for(int row=0; row<5; ++row) {
-            float y = 50.f + row * 100.f;
-            if (row % 2 == 0) {
-                for(int x=50; x<=750; x+=2) traseu.push_back({(float)x, y});
-                for(int dy=0; dy<100; dy+=2) traseu.push_back({750.f, y + dy});
-            } else {
-                for(int x=750; x>=50; x-=2) traseu.push_back({(float)x, y});
-                for(int dy=0; dy<100; dy+=2) traseu.push_back({50.f, y + dy});
-            }
-        }
-    }
-    else if (nivel == 9) {
-        pozProiector = {400.f, 300.f};
-        for (int i = 0; i < 800; ++i) {
-            float t = (float)i / 800 * 2.0f * PI; float r = 300.f * std::cos(4.0f * t);
-            traseu.push_back({400.f + r * std::cos(t), 300.f + r * std::sin(t)});
-        }
-    }
-    else { // Nivel 10+
+    else {
         pozProiector = {400.f, 250.f};
         for (int i = 0; i < 1000; ++i) {
             float t = (float)i / 1000 * 2.0f * PI;
@@ -108,12 +50,7 @@ Nivel::Nivel()
       stare(StareJoc::RULEAZA), nivelCurent(1),
       modAccuracyActiv(false), timpRamasAccuracy(0.0f)
 {
-    try {
-        incarcaHighScore();
-    } catch (const FisierCoruptException& e) {
-        std::cerr << e.what() << std::endl;
-        highScore = 0;
-    }
+    try { incarcaHighScore(); } catch (const FisierCoruptException& e) { std::cerr << e.what() << std::endl; highScore = 0; }
     genereazaTraseu(1);
     incarcaNivel(1);
 }
@@ -125,20 +62,15 @@ void Nivel::incarcaHighScore() {
     in.close();
 }
 
-void Nivel::salveazaHighScore() {
-    std::ofstream out("highscore.txt");
-    if (out.is_open()) { out << highScore; out.close(); }
-}
+void Nivel::salveazaHighScore() { std::ofstream out("highscore.txt"); if (out.is_open()) { out << highScore; out.close(); } }
 
 void Nivel::incarcaNivel(int numarNivel) {
-    nivelCurent = numarNivel;
-    reset();
+    nivelCurent = numarNivel; reset();
     std::cout << "--- INCARCARE NIVEL " << nivelCurent << " ---\n";
 }
 
 void Nivel::reset() {
-    stare = StareJoc::RULEAZA;
-    modAccuracyActiv = false; timpRamasAccuracy = 0.0f;
+    stare = StareJoc::RULEAZA; modAccuracyActiv = false; timpRamasAccuracy = 0.0f;
     proiectileInZbor.clear(); exploziiVizuale.clear();
     genereazaTraseu(nivelCurent);
     sirBile = SirDeBile(traseu, calculeazaVitezaNivel(nivelCurent), calculeazaDistantaBile(nivelCurent));
@@ -202,28 +134,31 @@ void Nivel::gestioneazaColiziuni() {
 
 void Nivel::adaugaProiectil(const Bila& p, const Vec2f& dir) { proiectileInZbor.push_back({p, dir}); }
 const std::list<Bila>& Nivel::getSirDeBile() const { return sirBile.getBile(); }
-
 Proiector& Nivel::getProiector() { return proiector; }
-
 const Proiector& Nivel::getProiector() const { return proiector; }
 const std::list<std::pair<Bila, Vec2f>>& Nivel::getProiectileInZbor() const { return proiectileInZbor; }
-
 int Nivel::getScor() const { return scor; }
 int Nivel::getHighScore() const { return highScore; }
-
 const std::vector<Vec2f>& Nivel::getTraseu() const { return traseu; }
-
 StareJoc Nivel::getStareJoc() const { return stare; }
-
 bool Nivel::esteTerminat() const { return stare == StareJoc::GAME_OVER; }
 bool Nivel::esteCastigat() const { return stare == StareJoc::CASTIGAT; }
-
 std::ostream& operator<<(std::ostream& os, const Nivel& n) { os << "Nivel " << n.nivelCurent << " (Scor: " << n.scor << ")\n"; return os; }
 Bila Nivel::trageBilaJucator() { std::vector<Culoare> c = sirBile.getCuloriActive(); return proiector.trage(c); }
 
-void Nivel::activeazaExplozieLa(Vec2f pozitie) { sirBile.explodeazaZona(pozitie, 250.0f); exploziiVizuale.push_back({pozitie, 250.0f, 1.0f}); }
-void Nivel::activeazaRetro() { sirBile.aplicaRetro(300.0f); }
-void Nivel::activeazaModAccuracy(float durata) { modAccuracyActiv = true; timpRamasAccuracy = durata; }
+void Nivel::activeazaExplozieLa(Vec2f pozitie, float raza) {
+    sirBile.explodeazaZona(pozitie, raza);
+    exploziiVizuale.push_back({pozitie, raza, 1.0f});
+}
+
+void Nivel::activeazaRetro(float distanta) {
+    sirBile.aplicaRetro(distanta);
+}
+
+void Nivel::activeazaModAccuracy(float durata) {
+    modAccuracyActiv = true;
+    timpRamasAccuracy = durata;
+}
 
 void Nivel::adaugaScor(int valoare) {
     scor += valoare;

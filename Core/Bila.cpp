@@ -54,12 +54,7 @@ void Bila::actualizeaza(float deltaTime) {
 void Bila::activeazaEfect(Nivel& nivel) {
     if (!efect) return;
 
-    if (dynamic_cast<EfectExplozie*>(efect.get())) {
-        nivel.activeazaExplozieLa(pozitie);
-    }
-    else {
-        efect->activeazaEfect(nivel);
-    }
+    efect->activeazaEfect(nivel, *this);
 
     efect = nullptr;
 }
