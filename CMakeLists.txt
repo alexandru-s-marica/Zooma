@@ -71,7 +71,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         Core/Exceptions.h
         App/Meniu.h
         App/Meniu.cpp
-
+        App/Game.cpp
+        App/Game.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
