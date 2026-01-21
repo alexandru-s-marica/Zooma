@@ -1,6 +1,7 @@
 #include "SirDeBile.h"
 #include "Efecte.h"
 #include "Nivel.h"
+#include "EfectFactory.h"
 #include <algorithm>
 #include <random>
 #include <cmath>
@@ -21,10 +22,12 @@ SirDeBile::SirDeBile(std::vector<Vec2f> traseu, float viteza, float distanta)
     }
     const int NUMAR_BILE_INITIALE = 10;
     float progresCurent = (NUMAR_BILE_INITIALE - 1) * distantaIntreBile;
-    static std::mt19937 generator(static_cast<unsigned int>(std::time(nullptr)));
+
+    static std::mt19937 gen(static_cast<unsigned int>(std::time(nullptr)));
     std::uniform_int_distribution<int> distCuloare(0, 4);
+
     for (int i = 0; i < NUMAR_BILE_INITIALE; ++i) {
-        bile.emplace_back(static_cast<Culoare>(distCuloare(generator)), getPozitiePeTraseu(progresCurent), 20.f, progresCurent);
+        bile.emplace_back(static_cast<Culoare>(distCuloare(gen)), getPozitiePeTraseu(progresCurent), 20.f, progresCurent);
         progresCurent -= distantaIntreBile;
     }
 }
@@ -74,7 +77,7 @@ void SirDeBile::verificaExplozieLant(std::list<Bila>::iterator stanga, std::list
     }
 }
 
-int numaraBileAdiacente(const std::list<Bila>& lista, std::list<Bila>::const_iterator startIt, bool spreCoada) {
+static int numaraBileAdiacenteHelper(const std::list<Bila>& lista, std::list<Bila>::const_iterator startIt, bool spreCoada) {
     if (startIt == lista.end()) return 0;
     Culoare c = startIt->getCuloare();
     int cnt = 0;
@@ -133,8 +136,8 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
                 if (it->getCuloare() == prev_it->getCuloare()) {
                     auto fwd_it = std::prev(it.base());
                     auto fwd_prev = std::prev(prev_it.base());
-                    int c1 = numaraBileAdiacente(bile, fwd_prev, true);
-                    int c2 = numaraBileAdiacente(bile, fwd_it, false);
+                    int c1 = numaraBileAdiacenteHelper(bile, fwd_prev, true);
+                    int c2 = numaraBileAdiacenteHelper(bile, fwd_it, false);
                     if (c1 + c2 >= 3) activeazaMagnet = true;
                 }
                 if (activeazaMagnet) {
@@ -164,22 +167,14 @@ void SirDeBile::actualizeaza(float deltaTime, Nivel& nivel) {
         timerGenerareEfectRandom = 0.f;
         static std::mt19937 gen(static_cast<unsigned int>(std::time(nullptr)));
         std::uniform_int_distribution<int> chance(0, 100);
+
         if (chance(gen) < 40 && !bile.empty()) {
             std::uniform_int_distribution<size_t> distIdx(0, bile.size() - 1);
             size_t idx = distIdx(gen);
             auto it = bile.begin();
             std::advance(it, idx);
             if (!it->areEfect() && !it->esteInDistrugere()) {
-                std::uniform_int_distribution<int> distTip(0, 3);
-                int tip = distTip(gen);
-                std::unique_ptr<EfectBila> e = nullptr;
-                switch(tip) {
-                    case 0: e = std::make_unique<EfectExplozie>(); break;
-                    case 1: e = std::make_unique<EfectRetro>(); break;
-                    case 2: e = std::make_unique<EfectAccuracy>(); break;
-                    case 3: e = std::make_unique<EfectBonusScor>(); break;
-                }
-                if (e) it->adaugaEfect(std::move(e));
+                it->adaugaEfect(EfectFactory::genereazaEfectRandom());
             }
         }
     }

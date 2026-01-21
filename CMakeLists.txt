@@ -74,6 +74,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         App/Game.cpp
         App/Game.h
         App/Buton.cpp
+        Core/EfectFactory.h
+        Core/EfectFactory.cpp
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
