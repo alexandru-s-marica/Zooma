@@ -22,7 +22,6 @@ public:
     Bila();
     Bila(Culoare c, Vec2f pos, float r, float progres = 0.f);
 
-
     Bila(const Bila& other);
 
     Bila& operator=(const Bila& other);

@@ -73,6 +73,7 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         App/Meniu.cpp
         App/Game.cpp
         App/Game.h
+        App/Buton.cpp
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
