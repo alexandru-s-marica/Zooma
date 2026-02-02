@@ -76,6 +76,7 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         App/Buton.cpp
         Core/EfectFactory.h
         Core/EfectFactory.cpp
+        Core/Statistica.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

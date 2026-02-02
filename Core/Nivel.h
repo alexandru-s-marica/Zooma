@@ -2,6 +2,7 @@
 #include "SirDeBile.h"
 #include "Proiector.h"
 #include "utils.h"
+#include "Statistica.h"
 #include <list>
 #include <vector>
 #include <iostream>
@@ -24,14 +25,14 @@ private:
     std::list<std::pair<Bila, Vec2f>> proiectileInZbor;
     std::vector<AnimatieExplozie> exploziiVizuale;
 
-    int scor;
+    Statistica<int> scor;
+    Statistica<float> timerAccuracy;
+
     int highScore;
+
     StareJoc stare;
-
     int nivelCurent;
-
     bool modAccuracyActiv;
-    float timpRamasAccuracy;
 
     void genereazaTraseu(int nivel);
     void genereazaTraseuProcedural(int nivel);
@@ -59,13 +60,13 @@ public:
 
     int getScor() const;
     int getHighScore() const;
+
     int getNivelCurent() const { return nivelCurent; }
     const std::vector<Vec2f>& getTraseu() const;
 
     StareJoc getStareJoc() const;
     bool esteTerminat() const;
     bool esteCastigat() const;
-
     bool esteVictorieFinala() const;
 
     bool esteAccuracyActiv() const { return modAccuracyActiv; }

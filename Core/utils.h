@@ -52,3 +52,10 @@ enum class Culoare { ROSU, VERDE, ALBASTRU, GALBEN, VIOLET, PORTOCALIU, UNKNOWN 
 
 const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 800;
+
+template <typename T>
+T clampValoare(T valoare, T min, T max) {
+    if (valoare < min) return min;
+    if (valoare > max) return max;
+    return valoare;
+}

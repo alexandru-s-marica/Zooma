@@ -163,9 +163,12 @@ void Nivel::genereazaTraseuProcedural(int nivel) {
 }
 
 Nivel::Nivel()
-    : sirBile(), proiector({400.f, 500.f}), scor(0), highScore(0),
+    : sirBile(), proiector({400.f, 500.f}),
+      scor(0),
+      timerAccuracy(0.0f),
+      highScore(0),
       stare(StareJoc::RULEAZA), nivelCurent(1),
-      modAccuracyActiv(false), timpRamasAccuracy(0.0f)
+      modAccuracyActiv(false)
 {
     try {
         incarcaHighScore();
@@ -204,7 +207,8 @@ void Nivel::incarcaNivel(int numarNivel) {
 void Nivel::reset() {
     stare = StareJoc::RULEAZA;
     modAccuracyActiv = false;
-    timpRamasAccuracy = 0.0f;
+    timerAccuracy.reset(0.0f);
+
     proiectileInZbor.clear();
     exploziiVizuale.clear();
 
@@ -227,8 +231,14 @@ void Nivel::ruleazaFrame(float deltaTime) {
     }
 
     if (modAccuracyActiv) {
-        timpRamasAccuracy -= deltaTime;
-        if (timpRamasAccuracy <= 0.f) modAccuracyActiv = false;
+        timerAccuracy.scade(deltaTime);
+
+        float timpSecurizat = clampValoare(timerAccuracy.get(), 0.0f, 100.0f);
+
+        if (timpSecurizat <= 0.001f) {
+            modAccuracyActiv = false;
+            timerAccuracy.reset(0.0f);
+        }
     }
 
     for (auto it = exploziiVizuale.begin(); it != exploziiVizuale.end(); ) {
@@ -242,17 +252,21 @@ void Nivel::ruleazaFrame(float deltaTime) {
 
     proiectileInZbor.remove_if([](const std::pair<Bila, Vec2f>& p) {
         const Vec2f& pos = p.first.getPozitie();
-        return pos.x < 0 || pos.x > SCREEN_WIDTH || pos.y < 0 || pos.y > SCREEN_HEIGHT;
+
+        float clampedX = clampValoare(pos.x, 0.0f, (float)SCREEN_WIDTH);
+        float clampedY = clampValoare(pos.y, 0.0f, (float)SCREEN_HEIGHT);
+
+        return (pos.x != clampedX || pos.y != clampedY);
     });
 
     gestioneazaColiziuni();
 
     if (sirBile.aAtingJucatorulSfarsitul()) {
         stare = StareJoc::GAME_OVER;
-        if (scor > highScore) { highScore = scor; salveazaHighScore(); }
+        if (scor.get() > highScore) { highScore = scor.get(); salveazaHighScore(); }
     } else if (sirBile.getBile().empty() && stare == StareJoc::RULEAZA) {
         stare = StareJoc::CASTIGAT;
-        if (scor > highScore) { highScore = scor; salveazaHighScore(); }
+        if (scor.get() > highScore) { highScore = scor.get(); salveazaHighScore(); }
     }
 }
 
@@ -262,7 +276,12 @@ void Nivel::gestioneazaColiziuni() {
         bool coliziuneDetectata = false;
         for (auto it_bila_sir = sirBile.getBile().begin(); it_bila_sir != sirBile.getBile().end(); ++it_bila_sir) {
             if (it_proiectil->first.getBounds().findIntersection(it_bila_sir->getBounds())) {
-                scor += sirBile.insereazaSiVerifica(it_bila_sir, it_proiectil->first);
+                int puncte = sirBile.insereazaSiVerifica(it_bila_sir, it_proiectil->first);
+
+                puncte = clampValoare(puncte, 0, 1000);
+
+                scor.adauga(puncte);
+
                 it_proiectil = proiectileInZbor.erase(it_proiectil);
                 coliziuneDetectata = true; break;
             }
@@ -279,7 +298,11 @@ const std::list<Bila>& Nivel::getSirDeBile() const { return sirBile.getBile(); }
 Proiector& Nivel::getProiector() { return proiector; }
 const Proiector& Nivel::getProiector() const { return proiector; }
 const std::list<std::pair<Bila, Vec2f>>& Nivel::getProiectileInZbor() const { return proiectileInZbor; }
-int Nivel::getScor() const { return scor; }
+
+int Nivel::getScor() const {
+    return scor.get();
+}
+
 int Nivel::getHighScore() const { return highScore; }
 const std::vector<Vec2f>& Nivel::getTraseu() const { return traseu; }
 StareJoc Nivel::getStareJoc() const { return stare; }
@@ -289,7 +312,7 @@ bool Nivel::esteCastigat() const { return stare == StareJoc::CASTIGAT; }
 bool Nivel::esteVictorieFinala() const { return stare == StareJoc::VICTORIE_FINALA; }
 
 std::ostream& operator<<(std::ostream& os, const Nivel& n) {
-    os << "Nivel " << n.nivelCurent << " (Scor: " << n.scor << ")\n";
+    os << "Nivel " << n.nivelCurent << " (Scor: " << n.scor.get() << ")\n";
     return os;
 }
 
@@ -309,9 +332,9 @@ void Nivel::activeazaRetro(float distanta) {
 
 void Nivel::activeazaModAccuracy(float durata) {
     modAccuracyActiv = true;
-    timpRamasAccuracy = durata;
+    timerAccuracy.setValoare(durata);
 }
 
 void Nivel::adaugaScor(int valoare) {
-    scor += valoare;
+    scor.adauga(valoare);
 }
