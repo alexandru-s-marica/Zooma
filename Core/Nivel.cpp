@@ -312,7 +312,9 @@ bool Nivel::esteCastigat() const { return stare == StareJoc::CASTIGAT; }
 bool Nivel::esteVictorieFinala() const { return stare == StareJoc::VICTORIE_FINALA; }
 
 std::ostream& operator<<(std::ostream& os, const Nivel& n) {
-    os << "Nivel " << n.nivelCurent << " (Scor: " << n.scor.get() << ")\n";
+    os << "Nivel " << n.nivelCurent
+       << " [Scor: " << n.scor.get()
+       << " | Max Sesiune: " << n.scor.getMax() << "]\n";
     return os;
 }
 
