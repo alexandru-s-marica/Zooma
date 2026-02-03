@@ -8,7 +8,7 @@ private:
     T valoareMaxima;
 
 public:
-    Statistica(T valoareInitiala = 0)
+    explicit Statistica(T valoareInitiala = 0)
         : valoareCurenta(valoareInitiala), valoareMaxima(valoareInitiala) {}
 
     void setValoare(T val) {
